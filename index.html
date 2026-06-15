@@ -187,6 +187,53 @@ body{font-family:"Microsoft YaHei","PingFang SC",sans-serif;background:var(--bg)
 .changelog-close{float:right;cursor:pointer;font-size:18px;color:var(--text-secondary);background:none;border:none}
 
 .shortcuts-hint{background:var(--hover-bg);border-radius:var(--radius);padding:10px 16px;margin-bottom:12px;font-size:12px;color:var(--text-secondary);line-height:1.8}
+
+/* 考试模式 */
+.exam-setup{background:var(--card);border-radius:var(--radius);padding:28px;margin-bottom:16px;box-shadow:var(--shadow)}
+.exam-setup h2{font-size:20px;margin-bottom:16px;color:var(--text)}
+.exam-row{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.exam-row label{font-size:14px;color:var(--text-secondary);min-width:80px}
+.exam-row select,.exam-row input[type=number]{padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;background:var(--input-bg);color:var(--text);outline:none}
+.exam-row select:focus,.exam-row input[type=number]:focus{border-color:var(--primary)}
+.exam-row input[type=number]{width:80px}
+.exam-chips{display:flex;gap:6px;flex-wrap:wrap}
+.exam-chip{padding:6px 14px;border:1.5px solid var(--border);border-radius:20px;font-size:13px;cursor:pointer;background:var(--card);color:var(--text-secondary);transition:.2s}
+.exam-chip:hover{border-color:var(--primary);color:var(--primary)}
+.exam-chip.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.exam-start-btn{margin-top:20px}
+
+.exam-active .question-card{display:none}
+.exam-active .question-card.exam-current{display:block}
+.exam-timer-bar{position:sticky;top:0;z-index:50;background:var(--card);border-radius:var(--radius);padding:12px 16px;margin-bottom:12px;display:flex;align-items:center;gap:16px;box-shadow:0 2px 8px rgba(0,0,0,.08);flex-wrap:wrap}
+.exam-timer{font-size:20px;font-weight:700;color:var(--primary);font-variant-numeric:tabular-nums}
+.exam-timer.urgent{color:var(--error);animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.exam-progress-text{font-size:13px;color:var(--text-secondary)}
+.exam-progress-bar{flex:1;min-width:100px;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+.exam-progress-bar .fill{height:100%;background:linear-gradient(90deg,#667eea,#764ba2);border-radius:3px;transition:width .3s}
+.exam-nav{display:flex;gap:8px;margin-top:12px;justify-content:center}
+.exam-nav .btn{min-width:100px}
+.exam-dot-grid{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px}
+.exam-dot{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:var(--card);color:var(--text-secondary);transition:.2s}
+.exam-dot.current{border-color:var(--primary);color:var(--primary);font-weight:700}
+.exam-dot.answered{background:var(--primary);color:#fff;border-color:var(--primary)}
+.exam-dot.correct{background:var(--success);color:#fff;border-color:var(--success)}
+.exam-dot.wrong{background:var(--error);color:#fff;border-color:var(--error)}
+
+.exam-result{background:var(--card);border-radius:var(--radius);padding:32px;text-align:center;box-shadow:var(--shadow)}
+.exam-result h2{font-size:22px;margin-bottom:8px}
+.exam-score-big{font-size:64px;font-weight:800;background:linear-gradient(135deg,#667eea,#764ba2);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin:16px 0}
+.exam-result-stats{display:flex;gap:20px;justify-content:center;margin:20px 0;flex-wrap:wrap}
+.exam-result-stat{text-align:center}
+.exam-result-stat .num{font-size:28px;font-weight:700}
+.exam-result-stat .label{font-size:12px;color:var(--text-secondary);margin-top:2px}
+.exam-result-detail{margin:20px 0;text-align:left;max-width:500px;margin-left:auto;margin-right:auto}
+.exam-result-item{padding:10px 14px;border:1px solid var(--border);border-radius:8px;margin-bottom:8px;font-size:13px;display:flex;align-items:flex-start;gap:10px}
+.exam-result-item .eri-num{font-weight:700;color:var(--primary);min-width:30px}
+.exam-result-item .eri-body{flex:1}
+.exam-result-item .eri-result{font-weight:600;margin-left:auto;white-space:nowrap}
+.exam-result-item .eri-result.ok{color:var(--success)}
+.exam-result-item .eri-result.ng{color:var(--error)}
 .shortcuts-hint kbd{padding:2px 6px;border:1px solid var(--border);border-radius:4px;background:var(--card);font-family:monospace;font-size:11px}
 
 .import-export{display:flex;gap:6px;flex-wrap:wrap}
@@ -250,6 +297,78 @@ body{font-family:"Microsoft YaHei","PingFang SC",sans-serif;background:var(--bg)
 
   <div class="nav" id="nav"></div>
 
+  <!-- 考试模式入口 -->
+  <div style="text-align:center;margin-bottom:12px">
+    <button class="btn btn-primary" onclick="openExamSetup()">模拟考试 / 随机抽题</button>
+  </div>
+
+  <!-- 考试设置面板 -->
+  <div class="exam-setup" id="exam-setup" style="display:none">
+    <h2>设置考试</h2>
+    <div class="exam-row">
+      <label>题目范围</label>
+      <div class="exam-chips" id="exam-hw-chips"></div>
+    </div>
+    <div class="exam-row">
+      <label>题型筛选</label>
+      <div class="exam-chips" id="exam-type-chips">
+        <span class="exam-chip active" onclick="toggleExamType('all',this)">全部</span>
+        <span class="exam-chip" onclick="toggleExamType('单选',this)">单选</span>
+        <span class="exam-chip" onclick="toggleExamType('多选',this)">多选</span>
+        <span class="exam-chip" onclick="toggleExamType('判断',this)">判断</span>
+        <span class="exam-chip" onclick="toggleExamType('填空',this)">填空</span>
+      </div>
+    </div>
+    <div class="exam-row">
+      <label>知识点</label>
+      <div class="exam-chips" id="exam-tag-chips" style="max-height:120px;overflow-y:auto">
+        <span class="exam-chip active" onclick="toggleExamTag('all',this)">全部</span>
+      </div>
+    </div>
+    <div class="exam-row">
+      <label>抽题数量</label>
+      <input type="number" id="exam-count" value="20" min="1" max="200">
+      <span style="font-size:13px;color:var(--text-secondary)">（可用：<span id="exam-available">0</span> 题）</span>
+    </div>
+    <div class="exam-row">
+      <label>限时（分钟）</label>
+      <input type="number" id="exam-time" value="30" min="1" max="180">
+      <span style="font-size:13px;color:var(--text-secondary)">0 = 不限时</span>
+    </div>
+    <div class="exam-row">
+      <label>出题模式</label>
+      <div class="exam-chips">
+        <span class="exam-chip active" id="exam-mode-rand" onclick="setExamMode('random',this)">随机抽题</span>
+        <span class="exam-chip" id="exam-mode-wrong" onclick="setExamMode('wrong',this)">错题重练</span>
+        <span class="exam-chip" id="exam-mode-fav" onclick="setExamMode('fav',this)">收藏抽题</span>
+        <span class="exam-chip" id="exam-mode-unseen" onclick="setExamMode('unseen',this)">未做题目</span>
+      </div>
+    </div>
+    <div class="exam-start-btn">
+      <button class="btn btn-primary" onclick="startExam()" style="padding:12px 40px;font-size:16px">开始考试</button>
+      <button class="btn btn-outline" onclick="closeExamSetup()" style="margin-left:10px">取消</button>
+    </div>
+  </div>
+
+  <!-- 考试进行中 -->
+  <div id="exam-active-area" style="display:none">
+    <div class="exam-timer-bar">
+      <span class="exam-timer" id="exam-timer">--:--</span>
+      <span class="exam-progress-text" id="exam-progress-text">1 / 20</span>
+      <div class="exam-progress-bar"><div class="fill" id="exam-progress-fill" style="width:0%"></div></div>
+      <button class="btn btn-danger btn-sm" onclick="submitExam()">交卷</button>
+    </div>
+    <div class="exam-dot-grid" id="exam-dots"></div>
+    <div id="exam-quiz"></div>
+    <div class="exam-nav">
+      <button class="btn btn-outline btn-sm" onclick="examNav(-1)">上一题</button>
+      <button class="btn btn-primary btn-sm" onclick="examNav(1)">下一题</button>
+    </div>
+  </div>
+
+  <!-- 考试结果 -->
+  <div class="exam-result" id="exam-result" style="display:none"></div>
+
   <div class="shortcuts-hint">
     快捷键：<kbd>Enter</kbd> 提交 · <kbd>Esc</kbd> 清空选项 · <kbd>←</kbd><kbd>→</kbd> 切题 · <kbd>Space</kbd> 随机跳题
   </div>
@@ -275,12 +394,14 @@ body{font-family:"Microsoft YaHei","PingFang SC",sans-serif;background:var(--bg)
   <div class="panel-footer" id="panel-footer"></div>
 </div>
 
-<div class="version-ball" onclick="toggleChangelog()">v2.0</div>
+<div class="version-ball" onclick="toggleChangelog()">v3.0</div>
 <div class="changelog-modal" id="changelog-modal" onclick="if(event.target===this)toggleChangelog()">
   <div class="changelog-content">
     <button class="changelog-close" onclick="toggleChangelog()">&times;</button>
     <h3>更新日志</h3>
-    <div class="cl-item"><span class="cl-ver">v2.0</span> 2026-06-14<br>全新升级：localStorage持久化、错题本、收藏夹、主题切换、字体大小、热力图、连续学习、每日目标、快捷键、导入导出、PWA支持</div>
+    <div class="cl-item"><span class="cl-ver">v3.0</span> 新增模拟考试模式：随机抽题、错题重练、收藏抽题、未做题目筛选、限时考试、答题卡、考试报告</div>
+    <div class="cl-item"><span class="cl-ver">v2.1</span> 为全部148道题添加详细中文解析</div>
+    <div class="cl-item"><span class="cl-ver">v2.0</span> 全新升级：localStorage持久化、错题本、收藏夹、主题切换、字体大小、热力图、连续学习、每日目标、快捷键、导入导出、PWA支持</div>
     <div class="cl-item"><span class="cl-ver">v1.0</span> 初始版本<br>基础刷题功能，7个作业约160道题</div>
   </div>
 </div>
@@ -291,6 +412,35 @@ body{font-family:"Microsoft YaHei","PingFang SC",sans-serif;background:var(--bg)
 // ============================================
 // 题目数据
 // ============================================
+// 知识点标签定义
+const TAGS = {
+  '命题联结词': [1,2,3,4,5,6,7,8,9,10,11,12,13],
+  '命题范式': [8,9,17,18,19,21],
+  '命题符号化': [20,22,23,24,25],
+  '命题判断': [14,15,16],
+  '量词与符号化': [26,27,28,29,30,31,44,45],
+  '辖域与变元': [32,33,34,35,42,43,46,47],
+  '解释与真值': [36,37,38,39,40,41],
+  '集合运算': [48,49,52,53,54,55,70],
+  '关系性质': [50,51,57,58,59,60],
+  '等价与偏序': [61,62,63,64,65,66,67,68,69],
+  '函数': [56],
+  '握手定理': [80,81,82,86],
+  '图的基本概念': [83,84,85,87,88,89,90,91,93,94,95],
+  '欧拉图与哈密尔顿图': [96,97,98,99,100,101,102,103,104,105,106,107,137,138,139,140,146,148,149,150,151],
+  '图的连通性': [108,109,110,111,112],
+  '平面图': [141,147,152,153,154,155,156,157,158],
+  '二部图与着色': [134,135,136,142,143,144,145],
+  '代数系统基础': [113,114,115,116,117,118,119,120,121,122],
+  '群与半群': [123,124,126],
+  '格与布尔代数': [125,127,128,129,130,131,132,133]
+};
+// 反向索引：题目ID → 标签列表
+const Q_TAGS = {};
+Object.entries(TAGS).forEach(([tag, ids]) => {
+  ids.forEach(id => { if (!Q_TAGS[id]) Q_TAGS[id] = []; Q_TAGS[id].push(tag); });
+});
+
 const Q = [
   {id:1,hw:'1',type:'单选',score:5,q:'设 $p=1$ 是素数，$q$：南京在北京的北边，$r$：苹果树是落叶乔木。则下列复合命题的真值为假的是( )',opts:['$\\lnot(p \\land q \\land \\lnot r)$','$(\\lnot p \\land q) \\to (p \\leftrightarrow r)$','$(p \\leftrightarrow q) \\lor (\\lnot p \\leftrightarrow \\lnot q)$','$\\lnot p \\lor q \\to \\lnot r$'],ans:'D',exp:'p:"1是素数"为假（1不是素数），q:"南京在北京的北边"为假，r:"苹果树是落叶乔木"为真。分别代入：A:¬(假∧假∧真)=¬假=真；B:(真∧假)→(假↔真)=假→假=真；C:(假↔假)∨(真↔真)=真∨真=真；D:真∨假→假=真→假=假。只有D为假，选D。'},
   {id:2,hw:'1',type:'单选',score:5,q:'公式 $(p \\to q) \\to q$ 的成假赋值为( )',opts:['011','000','001','111'],ans:'A',exp:'蕴涵式A→B仅在前件真后件假时为假。要使(p→q)→q为假，需p→q为真且q为假。当q=0时，p→0为真需p=0。所以成假赋值为p=0,q=0（对应选项A）。'},
@@ -1051,6 +1201,299 @@ if ('serviceWorker' in navigator) {
 // ============================================
 // 初始化
 // ============================================
+// ============================================
+// 考试模式
+// ============================================
+let examState = { mode: 'random', hw: 'all', type: 'all', tag: 'all', count: 20, timeLimit: 30, questions: [], current: 0, answers: {}, timer: null, secondsLeft: 0 };
+
+function openExamSetup() {
+  document.getElementById('exam-setup').style.display = 'block';
+  document.getElementById('exam-setup').scrollIntoView({ behavior: 'smooth' });
+  // 生成作业范围选项
+  const hws = [...new Set(Q.map(q => q.hw))];
+  let hwHtml = '<span class="exam-chip active" onclick="setExamHW(\'all\',this)">全部</span>';
+  hws.forEach(h => { hwHtml += `<span class="exam-chip" onclick="setExamHW('${h}',this)">${HW_NAMES[h] || h}</span>`; });
+  document.getElementById('exam-hw-chips').innerHTML = hwHtml;
+  // 生成知识点选项
+  const tagNames = Object.keys(TAGS);
+  let tagHtml = '<span class="exam-chip active" onclick="toggleExamTag(\'all\',this)">全部</span>';
+  tagNames.forEach(t => {
+    const count = TAGS[t].length;
+    tagHtml += `<span class="exam-chip" onclick="toggleExamTag('${t}',this)">${t}(${count})</span>`;
+  });
+  document.getElementById('exam-tag-chips').innerHTML = tagHtml;
+  updateExamAvailable();
+}
+
+function closeExamSetup() { document.getElementById('exam-setup').style.display = 'none'; }
+
+function setExamHW(hw, el) {
+  examState.hw = hw;
+  el.parentElement.querySelectorAll('.exam-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  updateExamAvailable();
+}
+
+function toggleExamType(type, el) {
+  examState.type = type;
+  el.parentElement.querySelectorAll('.exam-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  updateExamAvailable();
+}
+
+function toggleExamTag(tag, el) {
+  examState.tag = tag;
+  el.parentElement.querySelectorAll('.exam-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  updateExamAvailable();
+}
+
+function setExamMode(mode, el) {
+  examState.mode = mode;
+  el.parentElement.querySelectorAll('.exam-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  updateExamAvailable();
+}
+
+function getExamPool() {
+  let pool = examState.hw === 'all' ? [...Q] : Q.filter(q => q.hw === examState.hw);
+  if (examState.type !== 'all') pool = pool.filter(q => q.type === examState.type);
+  if (examState.tag !== 'all') {
+    const tagIds = TAGS[examState.tag] || [];
+    pool = pool.filter(q => tagIds.includes(q.id));
+  }
+  if (examState.mode === 'wrong') pool = pool.filter(q => state.wrongIds.includes(q.id));
+  else if (examState.mode === 'fav') pool = pool.filter(q => state.favIds.includes(q.id));
+  else if (examState.mode === 'unseen') pool = pool.filter(q => !state.answered[q.id]);
+  return pool;
+}
+
+function updateExamAvailable() {
+  const pool = getExamPool();
+  document.getElementById('exam-available').textContent = pool.length;
+  document.getElementById('exam-count').max = pool.length;
+  if (parseInt(document.getElementById('exam-count').value) > pool.length) {
+    document.getElementById('exam-count').value = pool.length;
+  }
+}
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
+
+function startExam() {
+  const pool = getExamPool();
+  const count = Math.min(parseInt(document.getElementById('exam-count').value) || 20, pool.length);
+  const timeLimit = parseInt(document.getElementById('exam-time').value) || 0;
+  if (!count) { alert('没有可用题目！'); return; }
+
+  examState.questions = shuffle(pool).slice(0, count);
+  examState.current = 0;
+  examState.answers = {};
+  examState.timeLimit = timeLimit;
+  examState.secondsLeft = timeLimit * 60;
+
+  document.getElementById('exam-setup').style.display = 'none';
+  document.getElementById('exam-active-area').style.display = 'block';
+  document.getElementById('exam-result').style.display = 'none';
+  document.getElementById('quiz').style.display = 'none';
+
+  // 计时
+  if (examState.timer) clearInterval(examState.timer);
+  if (timeLimit > 0) {
+    examState.timer = setInterval(() => {
+      examState.secondsLeft--;
+      updateExamTimer();
+      if (examState.secondsLeft <= 0) { clearInterval(examState.timer); submitExam(); }
+    }, 1000);
+  }
+  updateExamTimer();
+  renderExamDots();
+  renderExamQuestion();
+}
+
+function updateExamTimer() {
+  const el = document.getElementById('exam-timer');
+  if (examState.timeLimit <= 0) { el.textContent = '不限时'; el.classList.remove('urgent'); return; }
+  const m = Math.floor(examState.secondsLeft / 60);
+  const s = examState.secondsLeft % 60;
+  el.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+  el.classList.toggle('urgent', examState.secondsLeft <= 60);
+}
+
+function renderExamDots() {
+  const qs = examState.questions;
+  let html = '';
+  qs.forEach((q, i) => {
+    const ans = examState.answers[q.id];
+    let cls = 'exam-dot';
+    if (i === examState.current) cls += ' current';
+    if (ans !== undefined) cls += ' answered';
+    html += `<div class="${cls}" onclick="jumpExamQ(${i})">${i + 1}</div>`;
+  });
+  document.getElementById('exam-dots').innerHTML = html;
+  document.getElementById('exam-progress-text').textContent = `${examState.current + 1} / ${qs.length}`;
+  document.getElementById('exam-progress-fill').style.width = `${(examState.current + 1) / qs.length * 100}%`;
+}
+
+function renderExamQuestion() {
+  const q = examState.questions[examState.current];
+  const prevAns = examState.answers[q.id];
+  const letters = 'ABCDEFGH';
+  let html = `<div class="question-card exam-current">
+    <div class="q-top">
+      <span class="q-num">${examState.current + 1}. <span class="q-tag">${q.type}</span> <span style="color:var(--text-secondary);font-size:11px;font-weight:400;margin-left:4px">${HW_NAMES[q.hw] || q.hw}</span></span>
+      <span style="font-size:12px;color:var(--text-secondary)">${q.score}分</span>
+    </div>
+    <div class="q-body">${q.q}</div>`;
+
+  if (q.type === '单选' || q.type === '多选') {
+    html += `<div class="options" id="exam-opts-${q.id}">`;
+    q.opts.forEach((o, i) => {
+      let ocls = 'opt';
+      if (prevAns && prevAns.includes(letters[i])) ocls += ' selected';
+      html += `<div class="${ocls}" onclick="examSelectOpt(${q.id},'${letters[i]}','${q.type}')">
+        <span class="letter">${letters[i]}.</span><span>${o}</span></div>`;
+    });
+    html += `</div>`;
+    if (q.type === '多选') html += `<div class="multi-hint">可多选</div>`;
+  } else if (q.type === '填空') {
+    html += `<div class="fill-area"><input id="exam-fill-${q.id}" placeholder="输入答案..." value="${prevAns || ''}"
+      onkeydown="if(event.key==='Enter')examFill(${q.id})"></div>`;
+    html += `<div class="submit-row"><button class="btn btn-primary btn-sm" onclick="examFill(${q.id})">确认</button></div>`;
+  } else if (q.type === '判断') {
+    html += `<div class="tf-btns">
+      <div class="tf-btn ${prevAns === '对' ? 'selected' : ''}" onclick="examTF(${q.id},'对')">对</div>
+      <div class="tf-btn ${prevAns === '错' ? 'selected' : ''}" onclick="examTF(${q.id},'错')">错</div>
+    </div>`;
+  }
+
+  html += `</div>`;
+  document.getElementById('exam-quiz').innerHTML = html;
+  if (window.MathJax && MathJax.typeset) MathJax.typeset();
+}
+
+function examSelectOpt(id, letter, type) {
+  if (!examState.answers[id] || typeof examState.answers[id] === 'string' && type === '单选') {
+    if (type === '多选') {
+      if (!examState.answers[id] || typeof examState.answers[id] === 'string') examState.answers[id] = new Set();
+      if (examState.answers[id].has(letter)) examState.answers[id].delete(letter);
+      else examState.answers[id].add(letter);
+    } else {
+      examState.answers[id] = letter;
+    }
+  } else if (type === '多选') {
+    if (examState.answers[id].has(letter)) examState.answers[id].delete(letter);
+    else examState.answers[id].add(letter);
+  }
+  const opts = document.querySelectorAll(`#exam-opts-${id} .opt`);
+  const letters = 'ABCDEFGH';
+  opts.forEach((o, i) => {
+    o.classList.remove('selected');
+    const a = examState.answers[id];
+    if (a instanceof Set) { if (a.has(letters[i])) o.classList.add('selected'); }
+    else { if (a === letters[i]) o.classList.add('selected'); }
+  });
+  renderExamDots();
+}
+
+function examFill(id) {
+  const input = document.getElementById(`exam-fill-${id}`);
+  if (input && input.value.trim()) examState.answers[id] = input.value.trim();
+  renderExamDots();
+}
+
+function examTF(id, val) {
+  examState.answers[id] = val;
+  renderExamDots();
+  renderExamQuestion();
+}
+
+function jumpExamQ(idx) {
+  examState.current = idx;
+  renderExamDots();
+  renderExamQuestion();
+}
+
+function examNav(delta) {
+  const next = examState.current + delta;
+  if (next < 0 || next >= examState.questions.length) return;
+  examState.current = next;
+  renderExamDots();
+  renderExamQuestion();
+}
+
+function submitExam() {
+  if (examState.timer) clearInterval(examState.timer);
+  const qs = examState.questions;
+  let totalScore = 0, gotScore = 0, correctCount = 0;
+  const results = [];
+
+  qs.forEach((q, i) => {
+    const userAns = examState.answers[q.id];
+    let isCorrect = false;
+    if (userAns !== undefined) {
+      let correct = false;
+      if (q.type === '单选' || q.type === '多选') {
+        const ans = userAns instanceof Set ? [...userAns].sort().join('') : (userAns || '');
+        correct = ans === q.ans;
+      } else if (q.type === '填空') {
+        correct = (userAns || '').trim() === q.ans;
+      } else if (q.type === '判断') {
+        correct = userAns === q.ans;
+      }
+      isCorrect = correct;
+      if (correct) { correctCount++; gotScore += q.score; }
+    }
+    totalScore += q.score;
+    results.push({ q, userAns: userAns instanceof Set ? [...userAns].join('') : (userAns || '未作答'), isCorrect, idx: i + 1 });
+  });
+
+  const pct = totalScore ? Math.round(gotScore / totalScore * 100) : 0;
+  const grade = pct >= 90 ? '优秀 🎉' : pct >= 80 ? '良好 👍' : pct >= 60 ? '及格 😊' : '不及格 💪';
+
+  let detailHtml = '';
+  results.forEach(r => {
+    detailHtml += `<div class="exam-result-item">
+      <span class="eri-num">${r.idx}</span>
+      <div class="eri-body">
+        <div style="margin-bottom:4px;line-height:1.5">${r.q.q.substring(0, 80)}${r.q.q.length > 80 ? '...' : ''}</div>
+        <div style="font-size:12px;color:var(--text-secondary)">你的答案: ${r.userAns} &nbsp;|&nbsp; 正确答案: ${r.q.ans}</div>
+      </div>
+      <span class="eri-result ${r.isCorrect ? 'ok' : 'ng'}">${r.isCorrect ? '✓' : '✗'}</span>
+    </div>`;
+  });
+
+  document.getElementById('exam-active-area').style.display = 'none';
+  document.getElementById('exam-result').style.display = 'block';
+  document.getElementById('exam-result').innerHTML = `
+    <h2>考试结束 ${grade}</h2>
+    <div class="exam-score-big">${pct}分</div>
+    <div class="exam-result-stats">
+      <div class="exam-result-stat"><div class="num" style="color:var(--primary)">${qs.length}</div><div class="label">总题数</div></div>
+      <div class="exam-result-stat"><div class="num" style="color:var(--success)">${correctCount}</div><div class="label">正确</div></div>
+      <div class="exam-result-stat"><div class="num" style="color:var(--error)">${qs.length - correctCount}</div><div class="label">错误</div></div>
+      <div class="exam-result-stat"><div class="num" style="color:var(--warning)">${pct}%</div><div class="label">正确率</div></div>
+      <div class="exam-result-stat"><div class="num" style="color:var(--primary)">${gotScore.toFixed(1)}</div><div class="label">得分</div></div>
+    </div>
+    <div class="exam-result-detail">${detailHtml}</div>
+    <div style="margin-top:20px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+      <button class="btn btn-primary" onclick="openExamSetup()">再来一次</button>
+      <button class="btn btn-outline" onclick="exitExam()">返回刷题</button>
+    </div>
+  `;
+  document.getElementById('exam-result').scrollIntoView({ behavior: 'smooth' });
+}
+
+function exitExam() {
+  document.getElementById('exam-active-area').style.display = 'none';
+  document.getElementById('exam-result').style.display = 'none';
+  document.getElementById('quiz').style.display = 'block';
+  render();
+}
+
 function init() {
   checkDay();
   setTheme(state.theme, null);
