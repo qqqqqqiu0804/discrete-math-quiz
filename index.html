@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="离散数学">
 <link rel="manifest" href="manifest.json">
-<title>离散数学刷题 v2.0</title>
+<title>离散数学刷题 v3.1</title>
 <script>MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},svg:{fontCache:'global'}};</script>
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
 <style>
@@ -394,11 +394,12 @@ body{font-family:"Microsoft YaHei","PingFang SC",sans-serif;background:var(--bg)
   <div class="panel-footer" id="panel-footer"></div>
 </div>
 
-<div class="version-ball" onclick="toggleChangelog()">v3.0</div>
+<div class="version-ball" onclick="toggleChangelog()">v3.1</div>
 <div class="changelog-modal" id="changelog-modal" onclick="if(event.target===this)toggleChangelog()">
   <div class="changelog-content">
     <button class="changelog-close" onclick="toggleChangelog()">&times;</button>
     <h3>更新日志</h3>
+    <div class="cl-item"><span class="cl-ver">v3.1</span> 新增知识点筛选：19个知识模块可按知识点抽题</div>
     <div class="cl-item"><span class="cl-ver">v3.0</span> 新增模拟考试模式：随机抽题、错题重练、收藏抽题、未做题目筛选、限时考试、答题卡、考试报告</div>
     <div class="cl-item"><span class="cl-ver">v2.1</span> 为全部148道题添加详细中文解析</div>
     <div class="cl-item"><span class="cl-ver">v2.0</span> 全新升级：localStorage持久化、错题本、收藏夹、主题切换、字体大小、热力图、连续学习、每日目标、快捷键、导入导出、PWA支持</div>
