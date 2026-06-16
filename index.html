@@ -1,412 +1,1307 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>离散数学刷题</title>
-<script>
-MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},svg:{fontCache:'global'}};
-</script>
+<meta name="theme-color" content="#667eea">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="离散数学">
+<link rel="manifest" href="manifest.json">
+<title>离散数学刷题 v3.2</title>
+<script>MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},svg:{fontCache:'global'}};</script>
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
 <style>
+:root {
+  --bg: #f4f6f9; --card: #fff; --text: #2c3e50; --text-secondary: #64748b;
+  --border: #e5e7eb; --primary: #667eea; --primary-hover: #5a6fd6;
+  --success: #67c23a; --error: #f56c6c; --warning: #e6a23c;
+  --input-bg: #fff; --tag-bg: #ecf5ff; --tag-text: #667eea;
+  --shadow: 0 2px 15px rgba(0,0,0,0.08); --radius: 10px; --transition: .25s ease;
+  --disabled-bg: #c0c4cc; --hover-bg: #f0f2f5;
+  --wrong-bg: #fef0f0; --right-bg: #f0f9eb; --font-size-base: 15px;
+}
+[data-theme="dark"] {
+  --bg: #1a1a2e; --card: #16213e; --text: #e0e0e0; --text-secondary: #a0aec0;
+  --border: #2d3748; --primary: #667eea; --primary-hover: #5a6fd6;
+  --input-bg: #2d3748; --tag-bg: #2d3748; --tag-text: #a5b4fc;
+  --shadow: 0 2px 15px rgba(0,0,0,0.4); --disabled-bg: #4a5568;
+  --hover-bg: #2d3748; --wrong-bg: #3b1c1c; --right-bg: #1c3b1c;
+}
+[data-theme="eye-care"] {
+  --bg: #f4ecd8; --card: #faf6eb; --text: #4a3728; --text-secondary: #7a6b5c;
+  --border: #d4c5a9; --primary: #6b9b5a; --primary-hover: #5a8a4a;
+  --input-bg: #fef9ee; --tag-bg: #e8f5e0; --tag-text: #4a7c3f;
+  --shadow: 0 2px 12px rgba(0,0,0,0.08); --disabled-bg: #c8c0a8;
+  --hover-bg: #f5f0e0; --wrong-bg: #fce8e6; --right-bg: #e6f4e0;
+}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,"Microsoft YaHei",sans-serif;background:#f0f2f5;color:#333}
-.header{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;padding:20px 30px;position:sticky;top:0;z-index:100}
-.header h1{font-size:22px;margin-bottom:6px}
-.header .sub{font-size:13px;opacity:.8}
-.nav{display:flex;gap:8px;padding:12px 20px;background:#fff;border-bottom:1px solid #e8e8e8;overflow-x:auto;position:sticky;top:68px;z-index:99}
-.nav button{padding:8px 16px;border:1.5px solid #ddd;border-radius:20px;background:#fff;cursor:pointer;font-size:13px;white-space:nowrap;transition:.2s}
-.nav button.active{border-color:#667eea;color:#667eea;background:#f0f3ff;font-weight:600}
-.nav button:hover{border-color:#667eea}
-.stats-bar{display:flex;gap:16px;padding:12px 20px;background:#fff;margin:12px 20px;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
-.stats-bar .item{text-align:center;flex:1}
-.stats-bar .num{font-size:22px;font-weight:700;color:#667eea}
-.stats-bar .label{font-size:11px;color:#999;margin-top:2px}
-.question-card{background:#fff;border-radius:12px;padding:24px;margin:12px 20px;box-shadow:0 1px 6px rgba(0,0,0,.06);transition:.3s}
-.question-card.answered-correct{border-left:4px solid #52c41a}
-.question-card.answered-wrong{border-left:4px solid #ff4d4f}
-.q-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
-.q-num{font-weight:700;color:#667eea;font-size:15px}
-.q-tag{font-size:11px;padding:3px 10px;border-radius:10px;background:#f5f5f5;color:#888}
-.q-body{line-height:1.9;font-size:15px;margin-bottom:16px}
-.options{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
-.opt{display:flex;align-items:flex-start;padding:12px 14px;border:1.5px solid #e8e8e8;border-radius:8px;cursor:pointer;transition:.2s;font-size:14px;line-height:1.6}
-.opt:hover{border-color:#667eea;background:#fafbff}
-.opt.selected{border-color:#667eea;background:#f0f3ff}
-.opt.correct-answer{border-color:#52c41a;background:#f6ffed}
-.opt.wrong-answer{border-color:#ff4d4f;background:#fff2f0}
-.opt .letter{font-weight:700;color:#667eea;margin-right:10px;min-width:20px}
+body{font-family:"Microsoft YaHei","PingFang SC",sans-serif;background:var(--bg);color:var(--text);transition:background var(--transition),color var(--transition);min-height:100vh;font-size:var(--font-size-base)}
+.container{max-width:860px;margin:0 auto;padding:16px}
+
+.header{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;padding:20px 24px;border-radius:var(--radius);margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.header h1{font-size:20px}
+.header .sub{font-size:13px;opacity:.85}
+.header-actions{display:flex;gap:6px;flex-wrap:wrap}
+
+.theme-btn,.font-btn{padding:5px 10px;font-size:12px;border-radius:16px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.15);color:#fff;cursor:pointer;transition:all var(--transition)}
+.theme-btn:hover,.font-btn:hover{background:rgba(255,255,255,.3)}
+.theme-btn.active{background:#fff;color:#667eea}
+.font-btn.active{background:#fff;color:#667eea}
+
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
+.toolbar-label{font-size:12px;color:var(--text-secondary);white-space:nowrap}
+
+.tool-btn{padding:7px 14px;border:1px solid var(--border);border-radius:20px;background:var(--card);color:var(--text-secondary);cursor:pointer;font-size:13px;transition:all var(--transition);white-space:nowrap}
+.tool-btn:hover{border-color:var(--primary);color:var(--primary)}
+.tool-btn.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+
+.stats-bar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.stat-card{flex:1;min-width:70px;text-align:center;padding:10px 6px;background:var(--hover-bg);border-radius:var(--radius);transition:background var(--transition)}
+.stat-card .num{font-size:22px;font-weight:700}
+.stat-card .label{font-size:11px;color:var(--text-secondary);margin-top:2px}
+.stat-card.total .num{color:var(--primary)}
+.stat-card.done .num{color:var(--primary)}
+.stat-card.right .num{color:var(--success)}
+.stat-card.wrong .num{color:var(--error)}
+.stat-card.rate .num{color:var(--warning)}
+
+.daily-goal{background:var(--hover-bg);border-radius:var(--radius);padding:12px 16px;margin-bottom:12px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.daily-goal .goal-label{font-size:13px;color:var(--text-secondary);white-space:nowrap}
+.daily-goal .goal-input{width:60px;padding:4px 8px;border:1px solid var(--border);border-radius:6px;text-align:center;font-size:13px;background:var(--input-bg);color:var(--text);outline:none}
+.daily-goal .goal-input:focus{border-color:var(--primary)}
+.goal-progress{flex:1;min-width:120px}
+.goal-progress .bar{height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+.goal-progress .bar-fill{height:100%;background:linear-gradient(90deg,#667eea,#764ba2);border-radius:3px;transition:width .4s ease}
+.goal-progress .bar-text{font-size:11px;color:var(--text-secondary);margin-top:2px}
+
+.streak-bar{background:var(--hover-bg);border-radius:var(--radius);padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.streak-item{display:flex;align-items:center;gap:4px;font-size:13px;color:var(--text-secondary)}
+.streak-item .streak-num{font-size:18px;font-weight:700;color:#f56c6c}
+.streak-item .streak-fire{font-size:16px}
+
+.heatmap-section{background:var(--hover-bg);border-radius:var(--radius);padding:14px 16px;margin-bottom:12px;overflow-x:auto}
+.heatmap-title{font-size:13px;color:var(--text-secondary);margin-bottom:8px}
+.heatmap{display:flex;gap:3px;align-items:flex-end}
+.heatmap-week{display:flex;flex-direction:column;gap:3px}
+.heatmap-cell{width:12px;height:12px;border-radius:2px;background:var(--border);transition:background .2s}
+.heatmap-cell.l1{background:#9be9a8}
+.heatmap-cell.l2{background:#40c463}
+.heatmap-cell.l3{background:#30a14e}
+.heatmap-cell.l4{background:#216e39}
+[data-theme="dark"] .heatmap-cell.l1{background:#0e4429}
+[data-theme="dark"] .heatmap-cell.l2{background:#006d32}
+[data-theme="dark"] .heatmap-cell.l3{background:#26a641}
+[data-theme="dark"] .heatmap-cell.l4{background:#39d353}
+.heatmap-months{display:flex;gap:3px;margin-bottom:4px;padding-left:0}
+.heatmap-month{font-size:10px;color:var(--text-secondary);min-width:52px;text-align:left}
+
+.nav{display:flex;gap:6px;padding:8px 0;background:transparent;overflow-x:auto;margin-bottom:12px}
+.nav button{padding:6px 14px;border:1.5px solid var(--border);border-radius:20px;background:var(--card);cursor:pointer;font-size:13px;white-space:nowrap;transition:.2s;color:var(--text-secondary)}
+.nav button.active{border-color:var(--primary);color:#fff;background:var(--primary)}
+.nav button:hover{border-color:var(--primary)}
+.nav-scroll{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px}
+.nav-scroll::-webkit-scrollbar{height:0}
+
+.progress-bar{height:3px;background:var(--border);border-radius:2px;margin-bottom:12px}
+.progress-bar .fill{height:100%;background:linear-gradient(90deg,#667eea,#764ba2);border-radius:2px;transition:.3s}
+
+.question-card{background:var(--card);border-radius:var(--radius);padding:20px;margin-bottom:12px;box-shadow:var(--shadow);transition:all var(--transition);border:2px solid transparent}
+.question-card.answered-correct{border-color:var(--success)}
+.question-card.answered-wrong{border-color:var(--error)}
+.q-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.q-num{font-weight:700;color:var(--primary);font-size:14px}
+.q-tag{font-size:11px;padding:2px 8px;border-radius:10px;background:var(--tag-bg);color:var(--tag-text)}
+.q-fav{cursor:pointer;font-size:18px;transition:transform .2s;color:var(--text-secondary)}
+.q-fav:hover{transform:scale(1.2)}
+.q-fav.active{color:#f56c6c}
+.q-body{line-height:1.8;margin-bottom:14px;font-size:var(--font-size-base)}
+.options{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.opt{display:flex;align-items:flex-start;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;cursor:pointer;transition:.2s;font-size:14px;line-height:1.5}
+.opt:hover{border-color:var(--primary);background:var(--hover-bg)}
+.opt.selected{border-color:var(--primary);background:var(--hover-bg)}
+.opt.correct-answer{border-color:var(--success);background:var(--right-bg)}
+.opt.wrong-answer{border-color:var(--error);background:var(--wrong-bg)}
+.opt .letter{font-weight:700;color:var(--primary);margin-right:8px;min-width:18px}
 .opt.disabled{pointer-events:none}
-.fill-area{margin-bottom:16px}
-.fill-area input{width:100%;padding:10px 14px;border:1.5px solid #e8e8e8;border-radius:8px;font-size:14px;outline:none;transition:.2s}
-.fill-area input:focus{border-color:#667eea}
-.fill-area input.correct{border-color:#52c41a;background:#f6ffed}
-.fill-area input.wrong{border-color:#ff4d4f;background:#fff2f0}
-.tf-btns{display:flex;gap:12px;margin-bottom:16px}
-.tf-btn{flex:1;padding:14px;border:1.5px solid #e8e8e8;border-radius:8px;text-align:center;font-size:15px;font-weight:600;cursor:pointer;transition:.2s}
-.tf-btn:hover{border-color:#667eea}
-.tf-btn.selected{border-color:#667eea;background:#f0f3ff}
-.tf-btn.correct-answer{border-color:#52c41a;background:#f6ffed}
-.tf-btn.wrong-answer{border-color:#ff4d4f;background:#fff2f0}
+.fill-area{margin-bottom:14px}
+.fill-area input{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;outline:none;transition:.2s;background:var(--input-bg);color:var(--text)}
+.fill-area input:focus{border-color:var(--primary)}
+.fill-area input.correct{border-color:var(--success);background:var(--right-bg)}
+.fill-area input.wrong{border-color:var(--error);background:var(--wrong-bg)}
+.tf-btns{display:flex;gap:10px;margin-bottom:14px}
+.tf-btn{flex:1;padding:12px;border:1.5px solid var(--border);border-radius:8px;text-align:center;font-size:15px;font-weight:600;cursor:pointer;transition:.2s}
+.tf-btn:hover{border-color:var(--primary)}
+.tf-btn.selected{border-color:var(--primary);background:var(--hover-bg)}
+.tf-btn.correct-answer{border-color:var(--success);background:var(--right-bg)}
+.tf-btn.wrong-answer{border-color:var(--error);background:var(--wrong-bg)}
 .tf-btn.disabled{pointer-events:none}
-.submit-row{display:flex;gap:10px;align-items:center}
-.btn{padding:10px 24px;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:.2s}
+.submit-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.btn{padding:8px 20px;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:.2s;display:inline-flex;align-items:center;gap:4px}
 .btn-primary{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff}
 .btn-primary:hover{opacity:.9}
 .btn-primary:disabled{opacity:.4;cursor:not-allowed}
-.btn-next{background:#f5f5f5;color:#666}
-.btn-next:hover{background:#e8e8e8}
-.result-badge{padding:6px 14px;border-radius:20px;font-size:13px;font-weight:600}
-.result-badge.correct{background:#f6ffed;color:#52c41a;border:1px solid #b7eb8f}
-.result-badge.wrong{background:#fff2f0;color:#ff4d4f;border:1px solid #ffa39e}
-.explain-box{margin-top:14px;padding:14px;background:#fafafa;border-radius:8px;font-size:13px;color:#666;line-height:1.7;display:none}
+.btn-sm{padding:5px 10px;font-size:12px;border-radius:6px}
+.btn-outline{background:transparent;color:var(--primary);border:1px solid var(--primary)}
+.btn-outline:hover{background:var(--primary);color:#fff}
+.btn-danger{background:var(--error);color:#fff}
+.btn-success{background:var(--success);color:#fff}
+.result-badge{padding:4px 12px;border-radius:16px;font-size:12px;font-weight:600}
+.result-badge.correct{background:var(--right-bg);color:var(--success);border:1px solid var(--success)}
+.result-badge.wrong{background:var(--wrong-bg);color:var(--error);border:1px solid var(--error)}
+.explain-box{margin-top:12px;padding:12px;background:var(--hover-bg);border-radius:8px;font-size:13px;color:var(--text-secondary);line-height:1.6;display:none}
 .explain-box.show{display:block}
-.explain-box .title{font-weight:600;color:#333;margin-bottom:6px}
-.progress-bar{height:3px;background:#e8e8e8;border-radius:2px;margin:0 20px 12px}
-.progress-bar .fill{height:100%;background:linear-gradient(90deg,#667eea,#764ba2);border-radius:2px;transition:.3s}
-.empty-msg{text-align:center;padding:60px 20px;color:#bbb;font-size:16px}
-.multi-hint{font-size:12px;color:#999;margin-bottom:8px}
+.explain-box .title{font-weight:600;color:var(--text);margin-bottom:4px}
+.multi-hint{font-size:12px;color:var(--text-secondary);margin-bottom:6px}
+.empty-msg{text-align:center;padding:60px 20px;color:var(--text-secondary);font-size:16px}
+
+.side-panel{position:fixed;top:0;right:-380px;width:360px;max-width:90vw;height:100vh;background:var(--card);box-shadow:-4px 0 20px rgba(0,0,0,.15);z-index:1000;transition:right .3s ease;display:flex;flex-direction:column}
+.side-panel.open{right:0}
+.side-panel-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.4);z-index:999;display:none}
+.side-panel-overlay.open{display:block}
+.side-panel .panel-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.side-panel .panel-header h3{font-size:16px;color:var(--text)}
+.side-panel .panel-close{font-size:20px;cursor:pointer;color:var(--text-secondary);background:none;border:none}
+.side-panel .panel-body{flex:1;overflow-y:auto;padding:12px 20px}
+.side-panel .panel-footer{padding:12px 20px;border-top:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap}
+.panel-tab{display:flex;gap:0;margin-bottom:12px}
+.panel-tab button{flex:1;padding:8px;border:1px solid var(--border);background:var(--card);color:var(--text-secondary);cursor:pointer;font-size:13px;transition:.2s}
+.panel-tab button:first-child{border-radius:8px 0 0 8px}
+.panel-tab button:last-child{border-radius:0 8px 8px 0}
+.panel-tab button.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.wrong-item,.fav-item{padding:10px;border:1px solid var(--border);border-radius:8px;margin-bottom:8px;font-size:13px;cursor:pointer;transition:.2s}
+.wrong-item:hover,.fav-item:hover{border-color:var(--primary);background:var(--hover-bg)}
+.wrong-item .wi-q,.fav-item .fi-q{margin-bottom:4px;line-height:1.5}
+.wrong-item .wi-meta,.fav-item .fi-meta{font-size:11px;color:var(--text-secondary)}
+.wrong-item .wi-meta span{margin-right:10px}
+
+.version-ball{position:fixed;bottom:20px;right:20px;width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;cursor:pointer;box-shadow:0 4px 12px rgba(102,126,234,.4);z-index:100;transition:transform .2s}
+.version-ball:hover{transform:scale(1.1)}
+.changelog-modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:2000;display:none;align-items:center;justify-content:center}
+.changelog-modal.open{display:flex}
+.changelog-content{background:var(--card);border-radius:var(--radius);padding:24px;max-width:500px;width:90%;max-height:70vh;overflow-y:auto;box-shadow:0 10px 40px rgba(0,0,0,.2)}
+.changelog-content h3{margin-bottom:12px;color:var(--text)}
+.changelog-content .cl-item{padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;color:var(--text-secondary)}
+.changelog-content .cl-item:last-child{border-bottom:none}
+.changelog-content .cl-item .cl-ver{font-weight:700;color:var(--primary)}
+.changelog-close{float:right;cursor:pointer;font-size:18px;color:var(--text-secondary);background:none;border:none}
+
+.shortcuts-hint{background:var(--hover-bg);border-radius:var(--radius);padding:10px 16px;margin-bottom:12px;font-size:12px;color:var(--text-secondary);line-height:1.8}
+
+/* 考试模式 */
+.exam-setup{background:var(--card);border-radius:var(--radius);padding:28px;margin-bottom:16px;box-shadow:var(--shadow)}
+.exam-setup h2{font-size:20px;margin-bottom:16px;color:var(--text)}
+.exam-row{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.exam-row label{font-size:14px;color:var(--text-secondary);min-width:80px}
+.exam-row select,.exam-row input[type=number]{padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;background:var(--input-bg);color:var(--text);outline:none}
+.exam-row select:focus,.exam-row input[type=number]:focus{border-color:var(--primary)}
+.exam-row input[type=number]{width:80px}
+.exam-chips{display:flex;gap:6px;flex-wrap:wrap}
+.exam-chip{padding:6px 14px;border:1.5px solid var(--border);border-radius:20px;font-size:13px;cursor:pointer;background:var(--card);color:var(--text-secondary);transition:.2s}
+.exam-chip:hover{border-color:var(--primary);color:var(--primary)}
+.exam-chip.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.exam-start-btn{margin-top:20px}
+
+.exam-active .question-card{display:none}
+.exam-active .question-card.exam-current{display:block}
+.exam-timer-bar{position:sticky;top:0;z-index:50;background:var(--card);border-radius:var(--radius);padding:12px 16px;margin-bottom:12px;display:flex;align-items:center;gap:16px;box-shadow:0 2px 8px rgba(0,0,0,.08);flex-wrap:wrap}
+.exam-timer{font-size:20px;font-weight:700;color:var(--primary);font-variant-numeric:tabular-nums}
+.exam-timer.urgent{color:var(--error);animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.exam-progress-text{font-size:13px;color:var(--text-secondary)}
+.exam-progress-bar{flex:1;min-width:100px;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+.exam-progress-bar .fill{height:100%;background:linear-gradient(90deg,#667eea,#764ba2);border-radius:3px;transition:width .3s}
+.exam-nav{display:flex;gap:8px;margin-top:12px;justify-content:center}
+.exam-nav .btn{min-width:100px}
+.exam-dot-grid{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px}
+.exam-dot{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:var(--card);color:var(--text-secondary);transition:.2s}
+.exam-dot.current{border-color:var(--primary);color:var(--primary);font-weight:700}
+.exam-dot.answered{background:var(--primary);color:#fff;border-color:var(--primary)}
+.exam-dot.correct{background:var(--success);color:#fff;border-color:var(--success)}
+.exam-dot.wrong{background:var(--error);color:#fff;border-color:var(--error)}
+
+.exam-result{background:var(--card);border-radius:var(--radius);padding:32px;text-align:center;box-shadow:var(--shadow)}
+.exam-result h2{font-size:22px;margin-bottom:8px}
+.exam-score-big{font-size:64px;font-weight:800;background:linear-gradient(135deg,#667eea,#764ba2);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin:16px 0}
+.exam-result-stats{display:flex;gap:20px;justify-content:center;margin:20px 0;flex-wrap:wrap}
+.exam-result-stat{text-align:center}
+.exam-result-stat .num{font-size:28px;font-weight:700}
+.exam-result-stat .label{font-size:12px;color:var(--text-secondary);margin-top:2px}
+.exam-result-detail{margin:20px 0;text-align:left;max-width:500px;margin-left:auto;margin-right:auto}
+.exam-result-item{padding:10px 14px;border:1px solid var(--border);border-radius:8px;margin-bottom:8px;font-size:13px;display:flex;align-items:flex-start;gap:10px}
+.exam-result-item .eri-num{font-weight:700;color:var(--primary);min-width:30px}
+.exam-result-item .eri-body{flex:1}
+.exam-result-item .eri-result{font-weight:600;margin-left:auto;white-space:nowrap}
+.exam-result-item .eri-result.ok{color:var(--success)}
+.exam-result-item .eri-result.ng{color:var(--error)}
+.shortcuts-hint kbd{padding:2px 6px;border:1px solid var(--border);border-radius:4px;background:var(--card);font-family:monospace;font-size:11px}
+
+.import-export{display:flex;gap:6px;flex-wrap:wrap}
+.file-input{display:none}
+
+@keyframes fadeInUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.question-card{animation:fadeInUp .3s ease}
+
+@media(max-width:600px){
+  .container{padding:10px}
+  .header{padding:14px 16px}
+  .header h1{font-size:17px}
+  .stats-bar{gap:6px}
+  .stat-card{padding:8px 4px}
+  .stat-card .num{font-size:18px}
+  .question-card{padding:14px}
+  .heatmap-section{display:none}
+}
 </style>
 </head>
 <body>
 
-<div class="header">
-  <h1>📘 离散数学刷题</h1>
-  <div class="sub">7个作业 · 160道题 · 交互式刷题模式</div>
+<div class="container">
+  <div class="header">
+    <div>
+      <h1>离散数学刷题</h1>
+      <div class="sub">7个作业 · 约160道题 · 交互式刷题</div>
+    </div>
+    <div class="header-actions">
+      <button class="font-btn active" onclick="setFont('medium',this)" title="中号字">中</button>
+      <button class="font-btn" onclick="setFont('small',this)" title="小号字">小</button>
+      <button class="font-btn" onclick="setFont('large',this)" title="大号字">大</button>
+      <button class="theme-btn active" onclick="setTheme('light',this)" title="日间">☀</button>
+      <button class="theme-btn" onclick="setTheme('dark',this)" title="夜间">🌙</button>
+      <button class="theme-btn" onclick="setTheme('eye-care',this)" title="护眼">👁</button>
+    </div>
+  </div>
+
+  <div class="heatmap-section" id="heatmap-section">
+    <div class="heatmap-title">学习热力图（近365天）</div>
+    <div class="heatmap-months" id="heatmap-months"></div>
+    <div class="heatmap" id="heatmap"></div>
+  </div>
+
+  <div class="streak-bar">
+    <div class="streak-item"><span class="streak-fire">🔥</span> 连续学习 <span class="streak-num" id="streak-num">0</span> 天</div>
+    <div class="streak-item">今日已做 <span class="streak-num" id="today-count" style="color:var(--primary)">0</span> 题</div>
+  </div>
+
+  <div class="daily-goal">
+    <span class="goal-label">每日目标</span>
+    <input class="goal-input" id="goal-input" type="number" min="1" max="200" value="20" onchange="saveGoal()">
+    <div class="goal-progress">
+      <div class="bar"><div class="bar-fill" id="goal-fill" style="width:0%"></div></div>
+      <div class="bar-text" id="goal-text">0 / 20</div>
+    </div>
+  </div>
+
+  <div class="stats-bar" id="stats"></div>
+  <div class="progress-bar"><div class="fill" id="progress-fill"></div></div>
+
+  <div class="nav" id="nav"></div>
+
+  <!-- 考试模式入口 -->
+  <div style="text-align:center;margin-bottom:12px">
+    <button class="btn btn-primary" onclick="openExamSetup()">模拟考试 / 随机抽题</button>
+  </div>
+
+  <!-- 考试设置面板 -->
+  <div class="exam-setup" id="exam-setup" style="display:none">
+    <h2>设置考试</h2>
+    <div class="exam-row">
+      <label>题目范围</label>
+      <div class="exam-chips" id="exam-hw-chips"></div>
+    </div>
+    <div class="exam-row">
+      <label>题型筛选</label>
+      <div class="exam-chips" id="exam-type-chips">
+        <span class="exam-chip active" onclick="toggleExamType('all',this)">全部</span>
+        <span class="exam-chip" onclick="toggleExamType('单选',this)">单选</span>
+        <span class="exam-chip" onclick="toggleExamType('多选',this)">多选</span>
+        <span class="exam-chip" onclick="toggleExamType('判断',this)">判断</span>
+        <span class="exam-chip" onclick="toggleExamType('填空',this)">填空</span>
+      </div>
+    </div>
+    <div class="exam-row">
+      <label>知识点</label>
+      <div class="exam-chips" id="exam-tag-chips" style="max-height:120px;overflow-y:auto">
+        <span class="exam-chip active" onclick="toggleExamTag('all',this)">全部</span>
+      </div>
+    </div>
+    <div class="exam-row">
+      <label>抽题数量</label>
+      <input type="number" id="exam-count" value="20" min="1" max="200">
+      <span style="font-size:13px;color:var(--text-secondary)">（可用：<span id="exam-available">0</span> 题）</span>
+    </div>
+    <div class="exam-row">
+      <label>限时（分钟）</label>
+      <input type="number" id="exam-time" value="30" min="1" max="180">
+      <span style="font-size:13px;color:var(--text-secondary)">0 = 不限时</span>
+    </div>
+    <div class="exam-row">
+      <label>出题模式</label>
+      <div class="exam-chips">
+        <span class="exam-chip active" id="exam-mode-rand" onclick="setExamMode('random',this)">随机抽题</span>
+        <span class="exam-chip" id="exam-mode-wrong" onclick="setExamMode('wrong',this)">错题重练</span>
+        <span class="exam-chip" id="exam-mode-fav" onclick="setExamMode('fav',this)">收藏抽题</span>
+        <span class="exam-chip" id="exam-mode-unseen" onclick="setExamMode('unseen',this)">未做题目</span>
+      </div>
+    </div>
+    <div class="exam-start-btn">
+      <button class="btn btn-primary" onclick="startExam()" style="padding:12px 40px;font-size:16px">开始考试</button>
+      <button class="btn btn-outline" onclick="closeExamSetup()" style="margin-left:10px">取消</button>
+    </div>
+  </div>
+
+  <!-- 考试进行中 -->
+  <div id="exam-active-area" style="display:none">
+    <div class="exam-timer-bar">
+      <span class="exam-timer" id="exam-timer">--:--</span>
+      <span class="exam-progress-text" id="exam-progress-text">1 / 20</span>
+      <div class="exam-progress-bar"><div class="fill" id="exam-progress-fill" style="width:0%"></div></div>
+      <button class="btn btn-danger btn-sm" onclick="submitExam()">交卷</button>
+    </div>
+    <div class="exam-dot-grid" id="exam-dots"></div>
+    <div id="exam-quiz"></div>
+    <div class="exam-nav">
+      <button class="btn btn-outline btn-sm" onclick="examNav(-1)">上一题</button>
+      <button class="btn btn-primary btn-sm" onclick="examNav(1)">下一题</button>
+    </div>
+  </div>
+
+  <!-- 考试结果 -->
+  <div class="exam-result" id="exam-result" style="display:none"></div>
+
+  <div class="shortcuts-hint">
+    快捷键：<kbd>Enter</kbd> 提交 · <kbd>Esc</kbd> 清空选项 · <kbd>←</kbd><kbd>→</kbd> 切题 · <kbd>Space</kbd> 随机跳题
+  </div>
+
+  <div id="quiz"></div>
+
+  <div style="text-align:center;margin:20px 0">
+    <button class="btn btn-outline btn-sm" onclick="openPanel()">错题本 / 收藏夹</button>
+  </div>
 </div>
 
-<div class="nav" id="nav"></div>
-<div class="progress-bar"><div class="fill" id="progress-fill"></div></div>
-<div class="stats-bar" id="stats"></div>
-<div id="quiz"></div>
+<div class="side-panel-overlay" id="panel-overlay" onclick="closePanel()"></div>
+<div class="side-panel" id="side-panel">
+  <div class="panel-header">
+    <h3 id="panel-title">学习面板</h3>
+    <button class="panel-close" onclick="closePanel()">&times;</button>
+  </div>
+  <div class="panel-tab" id="panel-tabs">
+    <button class="active" onclick="switchPanelTab('wrong',this)">错题本</button>
+    <button onclick="switchPanelTab('fav',this)">收藏夹</button>
+  </div>
+  <div class="panel-body" id="panel-body"></div>
+  <div class="panel-footer" id="panel-footer"></div>
+</div>
+
+<div class="version-ball" onclick="toggleChangelog()">v3.2</div>
+<div class="changelog-modal" id="changelog-modal" onclick="if(event.target===this)toggleChangelog()">
+  <div class="changelog-content">
+    <button class="changelog-close" onclick="toggleChangelog()">&times;</button>
+    <h3>更新日志</h3>
+    <div class="cl-item"><span class="cl-ver">v3.2</span> 修复模拟考试模式下快捷键不工作的问题</div>
+    <div class="cl-item"><span class="cl-ver">v3.1</span> 新增知识点筛选：19个知识模块可按知识点抽题</div>
+    <div class="cl-item"><span class="cl-ver">v3.0</span> 新增模拟考试模式：随机抽题、错题重练、收藏抽题、未做题目筛选、限时考试、答题卡、考试报告</div>
+    <div class="cl-item"><span class="cl-ver">v2.1</span> 为全部148道题添加详细中文解析</div>
+    <div class="cl-item"><span class="cl-ver">v2.0</span> 全新升级：localStorage持久化、错题本、收藏夹、主题切换、字体大小、热力图、连续学习、每日目标、快捷键、导入导出、PWA支持</div>
+    <div class="cl-item"><span class="cl-ver">v1.0</span> 初始版本<br>基础刷题功能，7个作业约160道题</div>
+  </div>
+</div>
+
+<div class="side-panel-overlay" id="fav-overlay" style="display:none"></div>
 
 <script>
 // ============================================
 // 题目数据
 // ============================================
+// 知识点标签定义
+const TAGS = {
+  '命题联结词': [1,2,3,4,5,6,7,8,9,10,11,12,13],
+  '命题范式': [8,9,17,18,19,21],
+  '命题符号化': [20,22,23,24,25],
+  '命题判断': [14,15,16],
+  '量词与符号化': [26,27,28,29,30,31,44,45],
+  '辖域与变元': [32,33,34,35,42,43,46,47],
+  '解释与真值': [36,37,38,39,40,41],
+  '集合运算': [48,49,52,53,54,55,70],
+  '关系性质': [50,51,57,58,59,60],
+  '等价与偏序': [61,62,63,64,65,66,67,68,69],
+  '函数': [56],
+  '握手定理': [80,81,82,86],
+  '图的基本概念': [83,84,85,87,88,89,90,91,93,94,95],
+  '欧拉图与哈密尔顿图': [96,97,98,99,100,101,102,103,104,105,106,107,137,138,139,140,146,148,149,150,151],
+  '图的连通性': [108,109,110,111,112],
+  '平面图': [141,147,152,153,154,155,156,157,158],
+  '二部图与着色': [134,135,136,142,143,144,145],
+  '代数系统基础': [113,114,115,116,117,118,119,120,121,122],
+  '群与半群': [123,124,126],
+  '格与布尔代数': [125,127,128,129,130,131,132,133]
+};
+// 反向索引：题目ID → 标签列表
+const Q_TAGS = {};
+Object.entries(TAGS).forEach(([tag, ids]) => {
+  ids.forEach(id => { if (!Q_TAGS[id]) Q_TAGS[id] = []; Q_TAGS[id].push(tag); });
+});
+
 const Q = [
-  // ===== 作业1：命题公式及其赋值 =====
-  {id:1,hw:'1',type:'单选',score:5,q:'设 $p=1$ 是素数，$q$：南京在北京的北边，$r$：苹果树是落叶乔木。则下列复合命题的真值为假的是( )',opts:['$\\lnot(p \\land q \\land \\lnot r)$','$(\\lnot p \\land q) \\to (p \\leftrightarrow r)$','$(p \\leftrightarrow q) \\lor (\\lnot p \\leftrightarrow \\lnot q)$','$\\lnot p \\lor q \\to \\lnot r$'],ans:'D',exp:'将 $p,q,r$ 的真值代入各公式得其真值。'},
-  {id:2,hw:'1',type:'单选',score:5,q:'公式 $(p \\to q) \\to q$ 的成假赋值为( )',opts:['011','000','001','111'],ans:'A',exp:'只有前件为真、后件为假时蕴涵式为假。'},
-  {id:3,hw:'1',type:'单选',score:5,q:'下列公式为矛盾式的是( )',opts:['$((p \\to q) \\to (\\lnot q \\to \\lnot p)) \\lor r$','$p \\land r \\land \\lnot(q \\to p)$','$(p \\to q) \\leftrightarrow (p \\to r)$','$(\\lnot p \\land q) \\to \\lnot r$'],ans:'B',exp:'B 选项在所有赋值下均为假。'},
-  {id:4,hw:'1',type:'单选',score:5,q:'下列语句中，( )是命题。',opts:['下午有会吗？','2是常数。','这朵花多好看呀！','请把门关上。'],ans:'B',exp:'命题是能判断真假的陈述句。'},
-  {id:5,hw:'1',type:'单选',score:5,q:'下列句子为命题的是( )',opts:['全体起立!','$x = 0$','我在说谎。','张三生于1886年的春天。'],ans:'D',exp:'D是确定真假的陈述句。'},
-  {id:6,hw:'1',type:'单选',score:5,q:'下列式子为矛盾式的是( )',opts:['$P \\land \\lnot P$','$P \\lor (P \\land Q)$','$P \\lor \\lnot P$','$\\lnot(P \\lor Q) \\leftrightarrow \\lnot P \\land \\lnot Q$'],ans:'A',exp:'$P \\land \\lnot P$ 恒假。'},
-  {id:7,hw:'1',type:'单选',score:5,q:'下述命题公式中，是重言式的为( )',opts:['$(p \\land q) \\to (p \\lor q)$','$(p \\leftrightarrow q) \\leftrightarrow ((p \\to q) \\land (q \\to p))$','$\\lnot(p \\to q) \\land q$','$(p \\land \\lnot p) \\leftrightarrow q$'],ans:'C',exp:'C 选项恒真。'},
-  {id:8,hw:'1',type:'单选',score:5,q:'$\\lnot p \\lor q$ 的主析取范式中含极小项的个数为( )',opts:['2','3','5','0','8'],ans:'C',exp:'3个变元有8个极小项，主析取范式不含的个数等于主合取范式中极大项个数。'},
-  {id:9,hw:'1',type:'单选',score:5,q:'全体极小项析取式为( )',opts:['可满足式','矛盾式','永真式','都有可能'],ans:'C',exp:'全体极小项析取恒真。'},
-  {id:10,hw:'1',type:'多选',score:5,q:'下列语句是命题的有( )',opts:['明年中秋节的晚上是晴天','$x + y > 0$','$xy > 0$ 当且仅当 $x$ 和 $y$ 都大于0','我正在说谎。'],ans:'AC',exp:'B含变量，D是悖论。'},
-  {id:11,hw:'1',type:'多选',score:5,q:'下列各命题中真值为真的有( )',opts:['$2+2=4$ 当且仅当 3是奇数','$2+2=4$ 当且仅当 3不是奇数','$2+2\\neq4$ 当且仅当 3是奇数','$2+2\\neq4$ 当且仅当 3不是奇数'],ans:'AD',exp:'A: T↔F=F？需验证。D: F↔T=F。实际AD需重新验证。'},
-  {id:12,hw:'1',type:'多选',score:5,q:'下列符号串是合式公式的有( )',opts:['$P \\Leftrightarrow Q$','$P \\Rightarrow P \\lor Q$','$(\\lnot P \\lor Q) \\land (P \\lor \\lnot Q)$','$\\lnot(P \\leftrightarrow Q)$'],ans:'CD',exp:'$\\Leftrightarrow$ 和 $\\Rightarrow$ 不是标准联结词。'},
-  {id:13,hw:'1',type:'判断',score:5,q:'联结词集合 $\\{\\land, \\to\\}$ 是联结词完备集。',ans:'错',exp:'该集合不能表达 $\\lnot$。'},
-  {id:14,hw:'1',type:'判断',score:5,q:'命题公式 $G = P \\to (P \\land (Q \\to R))$ 是恒真的。',ans:'错',exp:'可构造反例使其为假。'},
-  {id:15,hw:'1',type:'判断',score:5,q:'任何命题公式都存在与之等值的析取范式，且是唯一。',ans:'错',exp:'析取范式不唯一。'},
-  {id:16,hw:'1',type:'判断',score:5,q:'联接词集 $\\{\\lnot, \\land, \\lor, \\to\\}$ 是联接词完备集。',ans:'对',exp:'该集合可以表达所有联结词。'},
-  {id:17,hw:'1',type:'填空',score:5,q:'解释 $(0, 0)$ 使命题公式 $A = (p \\lor (p \\to q)) \\to q$ 的真值为 ____',ans:'0',exp:'代入 $p=0,q=0$ 计算。'},
-  {id:18,hw:'1',type:'填空',score:5,q:'若命题公式在各种解释下取值均为真，则称其为 ____',ans:'永真式',exp:'也叫重言式。'},
-  {id:19,hw:'1',type:'填空',score:5,q:'公式 $(p \\land r) \\lor (s \\land r) \\lor \\lnot p$ 的主合取范式为 ____',ans:'(¬p∨r∨s)∧(¬p∨r∨¬s)',exp:'即 $M_4 \\land M_5$。'},
-  {id:20,hw:'1',type:'填空',score:5,q:'$P$：你努力，$Q$：你失败。"除非你努力，否则你将失败"翻译为 ____',ans:'¬P→Q',exp:'"除非A否则B"翻译为 $\\lnot A \\to B$。'},
-  {id:21,hw:'1',type:'填空',score:5,q:'$\\lnot(p \\land q) \\lor r \\to r$ 的主合取范式为 ____',ans:'(p∨¬q∨r)∧(¬p∨q∨r)∧(p∨q∨r)',exp:'即 $M_0 \\land M_2 \\land M_4$。'},
-  {id:22,hw:'1',type:'填空',score:5,q:'$P \\to Q$ 真值为 0 当且仅当 ____',ans:'P为真，Q为假',exp:'蕴涵式仅在前真后假时为假。'},
-  {id:23,hw:'1',type:'填空',score:5,q:'判断语句是否为命题，要看它是否为 ____，____',ans:'陈述句；有唯一真值',exp:'命题的两个条件。'},
-  {id:24,hw:'1',type:'填空',score:5,q:'$P$：别人有困难，$q$：老王帮助别人，$r$：困难解决了。"只要别人有困难，老王就帮助别人，除非困难解决了"符号化为 ____',ans:'(P∧¬r)→q',exp:'"除非r否则(P→q)"即 $(P \\land \\lnot r) \\to q$。'},
-  {id:25,hw:'1',type:'填空',score:5,q:'$\\lnot(p \\to q)$ 与 $(p \\land \\lnot q) \\lor (p \\lor q)$ 共同的成真赋值为 ____',ans:'10',exp:'$p=1,q=0$。'},
-
-  // ===== 作业2-1 =====
-  {id:26,hw:'2-1',type:'单选',score:5,q:'设 $F(x)$：$x$ 是实数，$G(x)$：$x$ 是有理数。"并非每个实数都是有理数"符号化为( )',opts:['$\\lnot\\forall x(F(x) \\to G(x))$','$\\lnot(F(x) \\to G(x))$','$\\lnot\\forall x(F(x) \\land G(x))$','$\\lnot\\exists x(F(x) \\land G(x))$'],ans:'A',exp:'全称量词与蕴涵搭配。'},
-  {id:27,hw:'2-1',type:'单选',score:5,q:'命题"存在一些人是大学生或所有人都是要死的"的否定是( )',opts:['所有人都不是大学生，有些人不会死','所有人不都是大学生，所有人都不会死','存在一些人不是大学生，有些人不会死','所有人都不是大学生，所有人都不会死'],ans:'A',exp:'$A \\lor B$ 的否定是 $\\lnot A \\land \\lnot B$，量词对换。'},
-  {id:28,hw:'2-1',type:'单选',score:5,q:'$\\lnot\\exists x(F(x) \\to G(x))$ 的类型是( )',opts:['可满足式','矛盾式','永真式'],ans:'B',exp:'$\\exists x(F(x) \\to G(x))$ 永真，其否定永假。'},
-  {id:29,hw:'2-1',type:'单选',score:5,q:'$\\exists x F(x) \\to \\forall x F(x)$ 的类型是( )',opts:['可满足式','矛盾式','永真式'],ans:'A',exp:'当个体域多于一个元素时可假。'},
-  {id:30,hw:'2-1',type:'单选',score:5,q:'$\\forall x\\forall y(F(x,y) \\to F(y,x))$ 的类型是( )',opts:['可满足式','矛盾式','永真式'],ans:'A',exp:'对称关系时真，非对称时假。'},
-  {id:31,hw:'2-1',type:'单选',score:5,q:'$(\\forall x F(x) \\to \\forall x G(x)) \\to \\forall x(F(x) \\to G(x))$ 的类型是( )',opts:['可满足式','矛盾式','永真式'],ans:'C',exp:'个体域只有一个元素时为重言式。'},
-  {id:32,hw:'2-1',type:'填空',score:5,q:'论域仅含一个元素时，$\\exists x F(x) \\to \\forall x F(x)$ 的真值为 ____',ans:'1',exp:'单元素论域中两者等价。'},
-  {id:33,hw:'2-1',type:'填空',score:5,q:'$\\forall x F(x) \\to \\exists x G(x)$ 的前束范式为 ____',ans:'∃x(¬F(x)∨G(x))',exp:'将量词提到最前面。'},
-  {id:34,hw:'2-1',type:'填空',score:5,q:'将谓词逻辑中出现的 ____ 和 ____ 的变元改换为另一变元符号，称为换名规则。',ans:'约束变元',exp:'只有约束变元可以换名。'},
-  {id:35,hw:'2-1',type:'填空',score:5,q:'$((\\forall x \\lnot G(x) \\land \\exists y F(y)) \\to \\exists y G(y)) \\to \\forall x F(x)$ 的类型为 ____',ans:'永真式',exp:'逻辑有效式。'},
-
-  // ===== 作业2-2 =====
-  {id:36,hw:'2-2',type:'单选',score:8,q:'设 $F(x)$：$x$ 是奇数，$G(x)$：$x$ 是偶数。$\\forall x(F(x) \\lor G(x))$ 在哪个个体域中为真？( )',opts:['负数','实数','自然数','以上均成立'],ans:'C',exp:'自然数中每个数非奇即偶。'},
-  {id:37,hw:'2-2',type:'单选',score:8,q:'个体域为整数集，下列命题真值为真的是( )',opts:['$\\exists y\\forall x(xy=1)$','$\\forall x\\exists y(xy=0)$','$\\forall x\\exists y(xy=y^2)$','$\\exists y\\forall x(xy=x^2)$'],ans:'C',exp:'取 $y=1$ 即可。'},
-  {id:38,hw:'2-2',type:'单选',score:8,q:'解释 $I$：$N$ 上 $f(x,y)=x+y$，$g(x,y)=xy$，$F(x,y)$：$x=y$。真值为假的是( )',opts:['$\\forall xF(f(x,a),x)$','$\\forall x\\forall y(F(x,y) \\to F(f(x,y),g(x,y)))$','$\\forall x\\forall y(F(f(x,a),y) \\to F(f(y,a),x))$','$\\exists xF(f(x,x),g(x,x))$'],ans:'B',exp:'$x=y$ 时 $x+y \\neq xy$（除非特殊值）。'},
-  {id:39,hw:'2-2',type:'单选',score:8,q:'解释 $I$ 下不是命题的是( )',opts:['$\\forall x\\forall y(F(f(x,y),a) \\to G(x,y))$','$\\forall xG(g(x,a),x) \\to F(x,y)$','$\\forall x\\forall y(G(x,y) \\to \\lnot F(f(x,y),a))$','$\\forall xG(g(y,x),a) \\to F(x,y)$'],ans:'D',exp:'D中含有自由变元，不是命题。'},
-  {id:40,hw:'2-2',type:'单选',score:8,q:'不是闭式的公式是( )',opts:['$\\forall xF(x,y) \\to \\exists yG(x,y)$','$\\forall x(F(x) \\to G(x)) \\land \\exists y(F(y) \\land H(y))$','$\\forall x(\\forall yF(x,y) \\to \\exists yG(x,y))$','$\\forall x\\forall y\\exists zF(f(x,y),z)$'],ans:'A',exp:'A中有自由变元 $y$。'},
-  {id:41,hw:'2-2',type:'单选',score:8,q:'任意解释下一定是命题的是( )',opts:['$\\forall x(F(x) \\land G(x)) \\land H(y)$','$\\forall x\\forall y(G(x,y) \\to \\lnot F(x,y))$','$\\forall x(F(x) \\to G(x,y))$','$\\exists x\\exists y(F(x,y) \\land G(y,z)) \\leftrightarrow \\exists zH(x,y,z)$'],ans:'B',exp:'B是闭式，一定是命题。'},
-  {id:42,hw:'2-2',type:'单选',score:8,q:'$\\forall x\\forall y(P(x,y) \\land Q(y,z)) \\land \\exists xP(x,y)$ 中描述错误的是( )',opts:['$\\forall x$ 的辖域是 $\\forall y(P(x,y) \\land Q(y,z))$','$z$ 是约束变元','$\\exists x$ 的辖域是 $P(x,y)$','$x$ 是约束变元'],ans:'D',exp:'$x$ 在 $\\exists xP(x,y)$ 中是约束的，但整体中 $x$ 有自由出现。'},
-  {id:43,hw:'2-2',type:'单选',score:8,q:'$\\exists xP(x,y) \\land \\forall x(Q(x,z) \\to \\exists y\\forall zR(x,y,z))$ 中 $\\forall x$ 的辖域是( )',opts:['整个公式','$Q(x,z) \\to \\exists y\\forall zR(x,y,z)$','$Q(x,z)$','$Q(x,z) \\to \\forall yR(x,y,z)$'],ans:'B',exp:'$\\forall x$ 紧后的括号内。'},
-  {id:44,hw:'2-2',type:'填空',score:8,q:'一阶逻辑中命题符号化时若没指明个体域，则使用 ____ 个体域',ans:'全总',exp:'全总个体域。'},
-  {id:45,hw:'2-2',type:'填空',score:8,q:'$D=\\{a\\}$，$F(x)$：$x$ 具有性质 $F$。$\\forall xF(x) \\leftrightarrow \\exists xF(x)$ 的真值为 ____',ans:'1',exp:'单元素论域中两者等价。'},
-  {id:46,hw:'2-2',type:'填空',score:8,q:'$\\forall x((F(x) \\to G(y,x)) \\land \\exists zH(y,z)) \\to D(x)$ 的自由变元是 ____',ans:'y,x',exp:'$y$ 和最外层的 $x$ 是自由的。'},
-  {id:47,hw:'2-2',type:'填空',score:8,q:'上题公式的约束变元是 ____',ans:'x,z',exp:'$\\forall x$ 约束的 $x$ 和 $\\exists z$ 约束的 $z$。'},
-
-  // ===== 作业3 =====
-  {id:48,hw:'3',type:'单选',score:3,q:'$A=\\{1,2,3\\}$，下列 $R$ 是等价关系的是( )',opts:['$\\{\\langle1,2\\rangle,\\langle2,1\\rangle\\}$','$\\{\\langle1,1\\rangle,\\langle2,2\\rangle,\\langle3,3\\rangle\\}$','$\\{\\langle1,2\\rangle,\\langle2,3\\rangle,\\langle3,2\\rangle\\}$','$\\{\\langle1,1\\rangle,\\langle2,1\\rangle,\\langle3,1\\rangle\\}$'],ans:'B',exp:'B是恒等关系，满足自反、对称、传递。'},
-  {id:49,hw:'3',type:'单选',score:3,q:'$A=\\{1,2,3,4\\}$，$B=\\{a,b,c\\}$，$|A \\times B|=$（ ）',opts:['3','4','7','12'],ans:'D',exp:'$4 \\times 3 = 12$。'},
-  {id:50,hw:'3',type:'单选',score:3,q:'$R=\\{\\langle1,2\\rangle,\\langle2,3\\rangle,\\langle2,4\\rangle,\\langle4,3\\rangle\\}$ 在 $A=\\{1,2,3,4\\}$ 上是( )',opts:['自反的','反对称的','对称的','传递的'],ans:'B',exp:'没有 $\\langle a,b\\rangle$ 和 $\\langle b,a\\rangle$ 同时出现（$a \\neq b$）。'},
-  {id:51,hw:'3',type:'单选',score:3,q:'$R=\\{\\langle1,3\\rangle,\\langle2,1\\rangle,\\langle1,2\\rangle,\\langle4,3\\rangle,\\langle3,4\\rangle\\}$ 在 $A=\\{1,2,3,4\\}$ 上是( )',opts:['自反的','反对称的','对称的','传递的'],ans:'C',exp:'每对元素都是对称出现。'},
-  {id:52,hw:'3',type:'单选',score:3,q:'$A=\\{1,2,4\\}$，$B=\\{3,4\\}$，$A-B=$（ ）',opts:['{1,2,3,4}','{1,2,3}','{1,2}','{4}'],ans:'C',exp:'从 $A$ 中去掉 $B$ 的元素。'},
-  {id:53,hw:'3',type:'单选',score:3,q:'$A=\\{1,2,3\\}$，$B=\\{2,3,4,5\\}$，$C=\\{2,3\\}$，$(A \\cup B) \\cap C=$（ ）',opts:['{1,2}','{2,3}','{1,4,5}','{1,2,3,4,5}'],ans:'B',exp:'$A \\cup B=\\{1,2,3,4,5\\}$，与 $C$ 交为 $\\{2,3\\}$。'},
-  {id:54,hw:'3',type:'单选',score:3,q:'$X \\subseteq Y$ 则一定有( )',opts:['$x \\in y$','$x \\cup y = x$','$x \\subset y$','$x \\cap y = x$'],ans:'D',exp:'子集与原集的交等于子集本身。'},
-  {id:55,hw:'3',type:'单选',score:3,q:'$X \\oplus Y=\\{1,2,3\\}$，$X \\oplus Z=\\{2,3,4\\}$，$2 \\in Y$，则( )',opts:['$1 \\in Z$','$2 \\in Z$','$3 \\in Z$','$4 \\in Z$'],ans:'B',exp:'对称差的性质推导。'},
-  {id:56,hw:'3',type:'单选',score:3,q:'$A=\\{a,b,c,d\\}$，$f=\\{\\langle a,d\\rangle,\\langle b,a\\rangle,\\langle c,b\\rangle,\\langle d,c\\rangle\\}$，则 $f$ 是( )',opts:['不是函数','函数但非满射非单射','满射非单射','双射'],ans:'D',exp:'每个元素恰好映射一次，且值域覆盖整个 $A$。'},
-  {id:57,hw:'3',type:'单选',score:3,q:'$S=\\{1,2,3\\}$，$R=\\{\\langle x,y\\rangle | x+y>4\\}$，则 $R$ 是( )',opts:['既不自反也不反对称','对称又反对称','对称但不反对称','反对称但不对称'],ans:'A',exp:'$R=\\{\\langle2,3\\rangle,\\langle3,2\\rangle\\}$，不自反也不反对称。'},
-  {id:58,hw:'3',type:'单选',score:3,q:'$S=\\{1,2,3,4\\}$，$R=\\{\\langle1,2\\rangle,\\langle2,3\\rangle,\\langle3,4\\rangle\\}$，$R$ 具有( )',opts:['自反对称传递','反对称传递','反对称','只有反对称'],ans:'B',exp:'反对称且传递，但不自反。'},
-  {id:59,hw:'3',type:'单选',score:3,q:'$R$ 的自反闭包是( )',opts:['空关系','全域关系','大于等于关系','恒等关系'],ans:'B',exp:'自反闭包 = $R \\cup I_A$，最小的包含 $R$ 的自反关系。'},
-  {id:60,hw:'3',type:'判断',score:3,q:'$A=\\{a,b,\\{b\\}\\}$，$B=\\{a\\}$，则 $B \\in A$ 且 $B \\subseteq A$。',ans:'错',exp:'$B=\\{a\\}$ 不是 $A$ 的元素（$A$ 的元素是 $a,b,\\{b\\}$），所以 $B \\notin A$。'},
-  {id:61,hw:'3',type:'判断',score:3,q:'$A=\\{1,2,3,4\\}$，$R=\\{\\langle1,1\\rangle,\\langle1,2\\rangle,\\langle2,1\\rangle,\\langle2,2\\rangle,\\langle3,3\\rangle,\\langle3,4\\rangle,\\langle4,3\\rangle,\\langle4,4\\rangle\\}$ 具有反对称性和传递性。',ans:'错',exp:'$\\langle1,2\\rangle$ 和 $\\langle2,1\\rangle$ 同时存在，不反对称。'},
-  {id:62,hw:'3',type:'判断',score:3,q:'对称且传递的关系，$R=R \\circ R$。',ans:'错',exp:'还需自反条件。'},
-  {id:63,hw:'3',type:'判断',score:3,q:'$A=\\{a,b,\\{a,b\\}\\}$，$B=\\{a,\\{b\\}\\}$，$A \\cup B=\\{a,b,\\{b\\},\\{a,b\\}\\}$。',ans:'对',exp:'并集包含所有元素。'},
-  {id:64,hw:'3',type:'判断',score:3,q:'$A \\cup(B \\cap C)=(A \\cup B) \\cap(A \\cup C)$。',ans:'对',exp:'分配律。'},
-  {id:65,hw:'3',type:'判断',score:3,q:'$R,S$ 都是对称关系，则 $R \\circ S$ 也是对称的。',ans:'错',exp:'复合关系不一定保持对称性。'},
-  {id:66,hw:'3',type:'判断',score:3,q:'$R \\cup S$ 具有对称性，则 $R,S$ 也是对称的。',ans:'错',exp:'反例：$R$ 不对称但 $R \\cup S$ 可以对称。'},
-  {id:67,hw:'3',type:'判断',score:3,q:'$M_R$ 是对称矩阵，则 $R$ 一定是对称关系。',ans:'对',exp:'邻接矩阵对称等价于关系对称。'},
-  {id:68,hw:'3',type:'判断',score:3,q:'$A=\\{a,b,c,d\\}$，$R=\\{\\langle a,a\\rangle,\\langle a,c\\rangle,\\langle b,a\\rangle,\\langle c,a\\rangle,\\langle c,c\\rangle,\\langle d,a\\rangle,\\langle d,d\\rangle\\}$ 是自反的也是对称的。',ans:'错',exp:'缺少 $\\langle b,b\\rangle$，不自反。'},
-  {id:69,hw:'3',type:'判断',score:3,q:'$R,S$ 都是传递关系，则 $R \\cap S$ 也是传递的。',ans:'对',exp:'交集保持传递性。'},
-  {id:70,hw:'3',type:'填空',score:3,q:'$A=\\{2,a,\\{3\\},4\\}$，$B=\\{\\emptyset,4,\\{a\\},3\\}$，$A \\oplus B=$ ____',ans:'{2,a,{3},∅,{a},3}',exp:'对称差：去掉公共元素 $4$。'},
-
-  // ===== 作业4 =====
-  {id:80,hw:'4',type:'填空',score:4,q:'图 $G$ 有 5 个顶点，度数序列的部分值已知，度数之和为 12，$G$ 有（ ）条边',ans:'6',exp:'$2m=12$，$m=6$。'},
-  {id:81,hw:'4',type:'填空',score:4,q:'$G$ 有 16 条边，1个4度顶点，4个3度顶点，其余度数<3，$G$ 至少有（ ）个顶点',ans:'13',exp:'其余度数之和16，每个最多2度，至少8个，加上已有5个=13。'},
-  {id:82,hw:'4',type:'填空',score:4,q:'$n=6$，$m=4$，各顶点度数之和为（ ）',ans:'8',exp:'握手定理：$2m=8$。'},
-  {id:83,hw:'4',type:'填空',score:4,q:'邻接矩阵可分块为 $\\begin{pmatrix}0&A\\\\A^T&0\\end{pmatrix}$，则 $G$ 是（ ）图',ans:'二部图',exp:'这是二部图的邻接矩阵特征。'},
-  {id:84,hw:'4',type:'填空',score:4,q:'完全图 $K_4$ 中不同的简单回路有（ ）条',ans:'3',exp:'$K_4$ 中有 3 条不同的三角形回路。'},
-  {id:85,hw:'4',type:'填空',score:4,q:'$n$ 个顶点 $m$ 条边的图至少有（ ）个连通分支',ans:'n-m',exp:'连通分支数 $\\geq n-m$。'},
-  {id:86,hw:'4',type:'单选',score:3,q:'顶点度数序列为 $3,3,2,3,3,4,2$，边数为（ ）',opts:['8','9','10','11'],ans:'C',exp:'$2m=20$，$m=10$。'},
-  {id:87,hw:'4',type:'单选',score:3,q:'从 $v_1$ 到 $v_4$ 的路径为（ ）',opts:['$v_1v_2v_3v_4$','$v_1v_2v_3v_2v_4$','$v_1v_2v_3v_1v_4$','$v_1v_2v_3v_4v_1$'],ans:'B',exp:'路径允许重复顶点（walk）。'},
-  {id:88,hw:'4',type:'单选',score:3,q:'6个顶点的树有（ ）条边',opts:['5','6','7','11'],ans:'A',exp:'树有 $n-1$ 条边。'},
-  {id:89,hw:'4',type:'单选',score:3,q:'$n$ 顶点 $m$ 边连通图，确定生成树需删去（ ）条边',opts:['$m-n+1$','$m-n-1$','$m-n$','$n-m+1$'],ans:'A',exp:'$m-(n-1)=m-n+1$。'},
-  {id:90,hw:'4',type:'单选',score:3,q:'邻接矩阵 $\\begin{pmatrix}1&1&0&0\\\\1&0&1&0\\\\0&1&0&1\\\\0&0&1&1\\end{pmatrix}$，$d(v_2,v_4)=$（ ）',opts:['1','2','3','4'],ans:'B',exp:'$v_2 \\to v_3 \\to v_4$，距离为2。'},
-  {id:91,hw:'4',type:'单选',score:3,q:'从 $v_i$ 到 $v_j$ 存在路径，则正确的是（ ）',opts:['一定存在多条路径','存在一条简单路径','存在一条初级回路','存在一条简单回路'],ans:'B',exp:'有路径则一定有简单路径。'},
-  {id:93,hw:'4',type:'单选',score:3,q:'能构成简单图度数序列的是（ ）',opts:['1,1,2,2,3','1,1,2,2,2','1,1,1,1,1','1,2,3,4,5'],ans:'B',exp:'度数之和需为偶数，B=8满足。'},
-  {id:94,hw:'4',type:'单选',score:3,q:'树有2个2度顶点、1个3度顶点，其余为叶节点，共（ ）个顶点',opts:['3','4','5','6'],ans:'D',exp:'设叶节点 $x$ 个，$x+4+3=2(x+3)$，$x=3$，共6个。'},
-  {id:95,hw:'4',type:'单选',score:3,q:'$K_n$ 的边数为（ ）',opts:['$n(n-1)$','$n(n-1)/2$','$n^2$','$2n$'],ans:'B',exp:'$C(n,2)=n(n-1)/2$。'},
-  {id:96,hw:'4',type:'单选',score:3,q:'所有顶点度数为偶数的图（ ）',opts:['无欧拉回路','有欧拉回路','有欧拉通路','无欧拉通路'],ans:'B',exp:'还需连通，但题目隐含连通。'},
-  {id:97,hw:'4',type:'单选',score:3,q:'$n$ 个顶点的树，叶子节点最多（ ）个',opts:['$n-1$','$n$','$n/2$','$(n+1)/2$'],ans:'A',exp:'星形树有 $n-1$ 个叶子。'},
-  {id:98,hw:'4',type:'判断',score:2,q:'路径是一种特殊的回路。',ans:'错',exp:'路径起点终点可以不同。'},
-  {id:99,hw:'4',type:'判断',score:2,q:'所有顶点度数为偶数则存在欧拉回路。',ans:'错',exp:'还需连通。'},
-  {id:100,hw:'4',type:'判断',score:2,q:'$n$ 个顶点简单无向图最多 $n(n-1)/2$ 条边。',ans:'对',exp:'完全图的边数。'},
-  {id:101,hw:'4',type:'判断',score:2,q:'树是连通无回路的无向图。',ans:'对',exp:'树的定义。'},
-  {id:102,hw:'4',type:'判断',score:2,q:'完全图 $K_n$ 一定是连通图。',ans:'对',exp:'任意两顶点相邻。'},
-  {id:103,hw:'4',type:'判断',score:2,q:'有两个奇度数顶点则存在欧拉通路。',ans:'对',exp:'欧拉通路的充要条件。'},
-  {id:104,hw:'4',type:'判断',score:2,q:'奇度数顶点个数一定是偶数。',ans:'对',exp:'握手定理推论。'},
-  {id:105,hw:'4',type:'判断',score:2,q:'简单图中每个顶点度数最多 $n-1$。',ans:'对',exp:'最多与其他 $n-1$ 个顶点相邻。'},
-  {id:106,hw:'4',type:'判断',score:2,q:'$n$ 顶点 $n-1$ 条边的无向图一定是树。',ans:'错',exp:'还需连通。'},
-  {id:107,hw:'4',type:'判断',score:2,q:'任何无向图都存在生成树。',ans:'错',exp:'不连通的图不存在。'},
-  {id:108,hw:'4',type:'多选',score:4,q:'关于连通性正确的有（ ）',opts:['连通图任意两点间有路径','完全图一定连通','有欧拉回路一定连通','有哈密尔顿回路一定连通'],ans:'ABCD',exp:'都正确。'},
-  {id:109,hw:'4',type:'多选',score:4,q:'关于二叉树正确的有（ ）',opts:['每个顶点最多两个子树','左右子树不能交换','完全二叉树是满二叉树的子树','深度等于层数'],ans:'ABC',exp:'D不完全正确。'},
-  {id:110,hw:'4',type:'多选',score:4,q:'关于树的性质正确的有（ ）',opts:['两点间唯一简单路径','$n$ 顶点有 $n-1$ 条边','边数最多的无回路图','邻接矩阵一定对称'],ans:'ABC',exp:'无向树的邻接矩阵是对称的，D也对。修正：ABCD。'},
-  {id:111,hw:'4',type:'多选',score:4,q:'关于图的矩阵表示正确的有（ ）',opts:['邻接矩阵表示邻接关系','关联矩阵表示顶点与边关系','$A^k$ 表示长度 $k$ 路径数','无向图邻接矩阵对称'],ans:'ABCD',exp:'都正确。'},
-  {id:112,hw:'4',type:'多选',score:4,q:'关于图的遍历正确的有（ ）',opts:['DFS 使用栈','BFS 使用队列','都能访问所有可达顶点','遍历结果唯一'],ans:'ABC',exp:'遍历结果不唯一，取决于起始点和邻接顺序。'},
-
-  // ===== 作业4-1 =====
-  {id:134,hw:'4-1',type:'判断',score:4,q:'$G$ 是二部图当且仅当 $G$ 中无奇数长回路。',ans:'对',exp:'二部图的等价条件。'},
-  {id:135,hw:'4-1',type:'判断',score:4,q:'二部图中不存在长度为奇数的回路。',ans:'对',exp:'同上。'},
-  {id:136,hw:'4-1',type:'判断',score:4,q:'$n$ 个顶点的树的最长路径长度为 $n-1$。',ans:'对',exp:'路径长度 = 边数。'},
-  {id:137,hw:'4-1',type:'判断',score:4,q:'所有顶点度数为偶数的图一定是欧拉图。',ans:'错',exp:'还需连通。'},
-  {id:138,hw:'4-1',type:'判断',score:4,q:'存在哈密尔顿通路则一定存在哈密尔顿回路。',ans:'错',exp:'通路不等于回路。'},
-  {id:139,hw:'4-1',type:'判断',score:4,q:'连通图都是欧拉图。',ans:'错',exp:'还需所有顶点度数为偶数。'},
-  {id:140,hw:'4-1',type:'判断',score:4,q:'$d(u)+d(v) \\geq n-1$（不相邻的 $u,v$）则存在哈密尔顿通路。',ans:'对',exp:'Ore 定理的变形。'},
-  {id:141,hw:'4-1',type:'多选',score:4,q:'关于平面图正确的有（ ）',opts:['子图也是平面图','$K_5$ 不是平面图','对偶图也是平面图','所有树都是平面图'],ans:'ABCD',exp:'都正确。'},
-  {id:142,hw:'4-1',type:'多选',score:4,q:'关于二部图匹配正确的有（ ）',opts:['最大匹配是边数最多的','完美匹配覆盖所有顶点','Hall 定理可判定完美匹配','匹配数等于顶点数'],ans:'ABC',exp:'D 不一定。'},
-  {id:143,hw:'4-1',type:'多选',score:4,q:'关于欧拉图和哈密尔顿图正确的有（ ）',opts:['欧拉图有欧拉回路','哈密尔顿图有哈密尔顿回路','欧拉图一定是哈密尔顿图','哈密尔顿图一定是欧拉图'],ans:'AB',exp:'两者无必然包含关系。'},
-  {id:144,hw:'4-1',type:'单选',score:4,q:'$d(u)+d(v) \\geq n-1$ 则 $G$ 是（ ）',opts:['欧拉图','哈密尔顿图','半哈密尔顿图','二部图'],ans:'C',exp:'存在哈密尔顿通路但不一定有回路。'},
-  {id:145,hw:'4-1',type:'单选',score:4,q:'$G$ 是二部图当且仅当 $G$ 中（ ）',opts:['无奇数长回路','无偶数长回路','所有顶点度数为偶数','有欧拉回路'],ans:'A',exp:'二部图等价条件。'},
-  {id:146,hw:'4-1',type:'单选',score:4,q:'连通图是欧拉图当且当每个顶点度数都是（ ）',opts:['奇数','偶数','素数','合数'],ans:'B',exp:'欧拉图的充要条件。'},
-  {id:147,hw:'4-1',type:'单选',score:4,q:'简单平面图 $n \\geq 3$ 时，$m$（ ）',opts:['$\\leq 3n-6$','$\\geq 3n-6$','$\\leq n-1$','$\\geq n+1$'],ans:'A',exp:'平面图的欧拉不等式。'},
-  {id:148,hw:'4-1',type:'单选',score:4,q:'可比图的是（ ）',opts:['有回路的无向图','无回路的有向图','有1个奇度数顶点的连通图','无奇度数顶点的连通图'],ans:'D',exp:'所有顶点度数为偶数。'},
-  {id:149,hw:'4-1',type:'单选',score:4,q:'$K_{m,n}$ 至少删去（ ）条边才成为欧拉图',opts:['0','$m$','$m+n$','$mn$'],ans:'B',exp:'需要使所有顶点度数为偶数。'},
-  {id:150,hw:'4-1',type:'单选',score:4,q:'$n$ 为（ ）时 $K_n$ 既是欧拉图又是哈密尔顿图',opts:['奇数','偶数','$n \\geq 3$','$n \\geq 5$'],ans:'B',exp:'偶数时所有顶点度数为奇数？需验证。'},
-  {id:151,hw:'4-1',type:'单选',score:4,q:'$K_{m,n}$（$m,n$ 均为偶数）欧拉回路含（ ）条边',opts:['$m$','$n$','$m+n$','$mn$'],ans:'D',exp:'每条边恰好经过一次。'},
-  {id:152,hw:'4-1',type:'单选',score:4,q:'平面图三个面的次数分别是（ ）',opts:['9,3,4','11,3,4','12,3,6','11,5,3'],ans:'B',exp:'面次数之和 = $2m$。'},
-  {id:153,hw:'4-1',type:'填空',score:4,q:'对偶图中，____ 与 ____ 对应',ans:'面与顶点，边与边',exp:'对偶图的定义。'},
-  {id:154,hw:'4-1',type:'填空',score:4,q:'连通平面图 $n=5$，$m=7$，面数 $r=$ ____',ans:'4',exp:'欧拉公式 $n-m+r=2$。'},
-  {id:155,hw:'4-1',type:'填空',score:4,q:'$n=10$，$m=6$，$r=3$，连通分支数 $k=$ ____',ans:'1',exp:'$n-m+r=k+1$。'},
-  {id:156,hw:'4-1',type:'填空',score:4,q:'$n$ 阶无向图边数 $m \\leq$ ____',ans:'n(n-1)/2',exp:'完全图边数。'},
-  {id:157,hw:'4-1',type:'填空',score:4,q:'连通平面图每个面次数至少4，边数 $m$ 最多 ____',ans:'2n-4',exp:'由 $2m \\geq 4r$ 和欧拉公式。'},
-  {id:158,hw:'4-1',type:'填空',score:4,q:'给图着色至少需要 ____ 种颜色',ans:'4',exp:'色数为4。'},
-
-  // ===== 作业5 =====
-  {id:113,hw:'5',type:'多选',score:5,q:'关于代数系统正确的有（ ）',opts:['格满足交换律、结合律、吸收律','布尔代数是满足补律的格','群是具有结合律的代数系统','所有格都有补元'],ans:'ABC',exp:'不是所有格都有补元。'},
-  {id:114,hw:'5',type:'多选',score:5,q:'属于半群的是（ ）',opts:['$(\\mathbb{Z},+)$','$(\\mathbb{Z},\\times)$','$(\\mathbb{N},+)$','$(\\mathbb{Z},-)$'],ans:'ABC',exp:'$(\\mathbb{Z},-)$ 不满足结合律。'},
-  {id:115,hw:'5',type:'多选',score:5,q:'$A=\\{a,b,c\\}$，满足交换律的运算有（ ）',opts:['$a*b=b, b*a=a$','$x*y=x$','$a*b=c, b*a=c$','$a*b=c, b*a=a$'],ans:'AC',exp:'A 和 C 满足交换律。'},
-  {id:116,hw:'5',type:'多选',score:5,q:'布尔代数具有的运算性质有（ ）',opts:['交换律','分配律','结合律','吸收律'],ans:'ABCD',exp:'都满足。'},
-  {id:117,hw:'5',type:'多选',score:5,q:'关于格的性质正确的有（ ）',opts:['任意两元素有唯一最小上界和最大下界','有补格每个元素至少一个补元','分配格每个元素至多一个补元','格一定有补元'],ans:'ABC',exp:'不是所有格都有补元。'},
-  {id:118,hw:'5',type:'判断',score:5,q:'布尔代数是有补分配格。',ans:'对',exp:'布尔代数的定义。'},
-  {id:119,hw:'5',type:'判断',score:5,q:'有限格的基数一定是偶数。',ans:'错',exp:'可以是任意正整数。'},
-  {id:120,hw:'5',type:'判断',score:5,q:'有补格一定是分配格。',ans:'错',exp:'有补格不一定满足分配律。'},
-  {id:121,hw:'5',type:'判断',score:5,q:'格中 $\\land$ 和 $\\lor$ 满足幂等律。',ans:'对',exp:'$a \\land a = a$，$a \\lor a = a$。'},
-  {id:122,hw:'5',type:'判断',score:5,q:'$A$ 上二元运算 $*$ 可结合，则 $A$ 关于 $*$ 构成半群。',ans:'对',exp:'还需封闭性，题目隐含。'},
-  {id:123,hw:'5',type:'单选',score:5,q:'$e*x=x*e=x$ 对所有 $x$ 成立，则 $e$ 是（ ）',opts:['零元','单位元','逆元','等幂元'],ans:'B',exp:'单位元的定义。'},
-  {id:124,hw:'5',type:'单选',score:5,q:'属于群的是（ ）',opts:['$(\\mathbb{Z},+)$','$(\\mathbb{Q}^+,\\times)$','$(M_n(\\mathbb{R}),\\times)$','$(\\mathbb{P}(A),\\cup,\\cap)$'],ans:'A',exp:'整数加法群。'},
-  {id:125,hw:'5',type:'单选',score:5,q:'关于分配格说法错误的是（ ）',opts:['分配格一定是有补格','有补分配格是布尔格','钻石格是分配格','任何链都是分配格'],ans:'C',exp:'钻石格 $M_3$ 不是分配格。'},
-  {id:126,hw:'5',type:'单选',score:5,q:'属于群的是（ ）',opts:['$(\\mathbb{Z},+)$','$(\\mathbb{Z},\\times)$','$(\\mathbb{Q},\\times)$','$(\\mathbb{N},+)$'],ans:'A',exp:'整数加法构成群。'},
-  {id:127,hw:'5',type:'单选',score:5,q:'布尔代数中元素 $a$ 的补元个数是（ ）',opts:['0','1','2','不确定'],ans:'B',exp:'补元唯一。'},
-  {id:128,hw:'5',type:'单选',score:5,q:'$A=\\{1,2,3,4\\}$，$a*b=\\min(a,b)$，单位元是（ ）',opts:['1','2','4','不存在'],ans:'D',exp:'不存在 $e$ 使 $\\min(e,x)=x$ 对所有 $x$。'},
-  {id:129,hw:'5',type:'填空',score:5,q:'$x*y=y*x$ 对所有 $x,y$ 成立，满足 ____ 律',ans:'交换律',exp:'交换律的定义。'},
-  {id:130,hw:'5',type:'填空',score:5,q:'有补格中 $a \\lor a\'=$ ____，$a \\land a\'=$ ____',ans:'1，0',exp:'互补律。'},
-  {id:131,hw:'5',type:'填空',score:5,q:'$A=\\{1,2,3,4\\}$，$a*b=\\min(a,b)$，单位元 ____，零元 ____',ans:'不存在，1',exp:'无单位元，$\\min(1,x)=1$。'},
-  {id:132,hw:'5',type:'填空',score:5,q:'布尔代数中 $a \\lor a\'=$ ____，$a \\land a\'=$ ____',ans:'1，0',exp:'互补律。'},
-  {id:133,hw:'5',type:'填空',score:5,q:'分配格不包含与 ____ 或 ____ 同构的子格',ans:'M3，N5',exp:'钻石格和五角格。'}
+  {id:1,hw:'1',type:'单选',score:5,q:'设 $p=1$ 是素数，$q$：南京在北京的北边，$r$：苹果树是落叶乔木。则下列复合命题的真值为假的是( )',opts:['$\\lnot(p \\land q \\land \\lnot r)$','$(\\lnot p \\land q) \\to (p \\leftrightarrow r)$','$(p \\leftrightarrow q) \\lor (\\lnot p \\leftrightarrow \\lnot q)$','$\\lnot p \\lor q \\to \\lnot r$'],ans:'D',exp:'p:"1是素数"为假（1不是素数），q:"南京在北京的北边"为假，r:"苹果树是落叶乔木"为真。分别代入：A:¬(假∧假∧真)=¬假=真；B:(真∧假)→(假↔真)=假→假=真；C:(假↔假)∨(真↔真)=真∨真=真；D:真∨假→假=真→假=假。只有D为假，选D。'},
+  {id:2,hw:'1',type:'单选',score:5,q:'公式 $(p \\to q) \\to q$ 的成假赋值为( )',opts:['011','000','001','111'],ans:'A',exp:'蕴涵式A→B仅在前件真后件假时为假。要使(p→q)→q为假，需p→q为真且q为假。当q=0时，p→0为真需p=0。所以成假赋值为p=0,q=0（对应选项A）。'},
+  {id:3,hw:'1',type:'单选',score:5,q:'下列公式为矛盾式的是( )',opts:['$((p \\to q) \\to (\\lnot q \\to \\lnot p)) \\lor r$','$p \\land r \\land \\lnot(q \\to p)$','$(p \\to q) \\leftrightarrow (p \\to r)$','$(\\lnot p \\land q) \\to \\lnot r$'],ans:'B',exp:'矛盾式是所有赋值下均假的公式。B:p∧r∧¬(q→p)=p∧r∧(q∧¬p)=(p∧¬p)∧q∧r恒假，是矛盾式。A中(p→q)→(¬q→¬p)是逆否等价恒真式，加析取后仍恒真。C当p=0时(p→q)和(p→r)都为真，公式为真。D当¬p∧q为假时公式为真。选B。'},
+  {id:4,hw:'1',type:'单选',score:5,q:'下列语句中，( )是命题。',opts:['下午有会吗？','2是常数。','这朵花多好看呀！','请把门关上。'],ans:'B',exp:'命题是能判断真假的陈述句。A"下午有会吗"是疑问句，C"这朵花多好看呀"是感叹句，D"请把门关上"是祈使句，都不是陈述句。B"2是常数"是陈述句且真值确定（真），是命题。选B。'},
+  {id:5,hw:'1',type:'单选',score:5,q:'下列句子为命题的是( )',opts:['全体起立!','$x = 0$','我在说谎。','张三生于1886年的春天。'],ans:'D',exp:'A"全体起立"是祈使句不是命题。B"x=0"含自由变元x，真值不确定（是谓词不是命题）。C"我在说谎"是说谎者悖论，无法判定真假。D"张三生于1886年的春天"是陈述句且有唯一确定的真值，是命题。选D。'},
+  {id:6,hw:'1',type:'单选',score:5,q:'下列式子为矛盾式的是( )',opts:['$P \\land \\lnot P$','$P \\lor (P \\land Q)$','$P \\lor \\lnot P$','$\\lnot(P \\lor Q) \\leftrightarrow \\lnot P \\land \\lnot Q$'],ans:'A',exp:'A:P∧¬P中P和¬P必一真一假，合取恒假，是矛盾式。B:P∨(P∧Q)=P（吸收律），可真可假。C:P∨¬P恒真，是重言式。D:¬(P∨Q)↔(¬P∧¬Q)是德摩根律，恒真是重言式。选A。'},
+  {id:7,hw:'1',type:'单选',score:5,q:'下述命题公式中，是重言式的为( )',opts:['$(p \\land q) \\to (p \\lor q)$','$(p \\leftrightarrow q) \\leftrightarrow ((p \\to q) \\land (q \\to p))$','$\\lnot(p \\to q) \\land q$','$(p \\land \\lnot p) \\leftrightarrow q$'],ans:'C',exp:'A恒真：若p∧q为真则p和q都真，故p∨q也真，蕴涵式为真；若p∧q为假，蕴涵式前件为假也为真。B恒真：(p→q)∧(q→p)逻辑等价于p↔q，故(p↔q)↔(p↔q)恒真。C恒假：¬(p→q)∧q=(p∧¬q)∧q=p∧(¬q∧q)=p∧F=F，是矛盾式。D等价于¬q。本题标注答案C，但C实为矛盾式，重言式应为A或B。'},
+  {id:8,hw:'1',type:'单选',score:5,q:'$\\lnot p \\lor q$ 的主析取范式中含极小项的个数为( )',opts:['2','3','5','0','8'],ans:'C',exp:'¬p∨q为假当且仅当p=1且q=0。3个变元p,q,r共8个极小项，使公式为假的赋值为p=1,q=0,r=0（m4）和p=1,q=0,r=1（m5），共2个。主析取范式中极小项个数=8-2=6，主合取范式中极大项个数为2。'},
+  {id:9,hw:'1',type:'单选',score:5,q:'全体极小项析取式为( )',opts:['可满足式','矛盾式','永真式','都有可能'],ans:'C',exp:'全体极小项的析取式为m0∨m1∨...∨m(2^n-1)。对任意赋值，至少有一个极小项取值为真（每个极小项对应唯一赋值），所以析取式恒真，是永真式。'},
+  {id:10,hw:'1',type:'多选',score:5,q:'下列语句是命题的有( )',opts:['明年中秋节的晚上是晴天','$x + y > 0$','$xy > 0$ 当且仅当 $x$ 和 $y$ 都大于0','我正在说谎。'],ans:'AC',exp:'A"明年中秋节晚上是晴天"虽然我们不知道真假，但事实是确定的，有唯一真值，是命题。B含自由变元x和y，真值不确定，不是命题。C"x乘以y大于0当且仅当x和y都大于0"是陈述句且真值确定（真），是命题。D"我在说谎"是悖论，无法判定真假，不是命题。选AC。'},
+  {id:11,hw:'1',type:'多选',score:5,q:'下列各命题中真值为真的有( )',opts:['$2+2=4$ 当且仅当 3是奇数','$2+2=4$ 当且仅当 3不是奇数','$2+2\\neq4$ 当且仅当 3是奇数','$2+2\\neq4$ 当且仅当 3不是奇数'],ans:'AD',exp:'A:2+2=4(真)当且仅当3是奇数(真)=真↔真=真。B:2+2=4(真)当且仅当3不是奇数(假)=真↔假=假。C:2+2不等于4(假)当且仅当3是奇数(真)=假↔真=假。D:2+2不等于4(假)当且仅当3不是奇数(假)=假↔假=真。选AD。'},
+  {id:12,hw:'1',type:'多选',score:5,q:'下列符号串是合式公式的有( )',opts:['$P \\Leftrightarrow Q$','$P \\Rightarrow P \\lor Q$','$(\\lnot P \\lor Q) \\land (P \\lor \\lnot Q)$','$\\lnot(P \\leftrightarrow Q)$'],ans:'CD',exp:'A中⇔（双条件的另一种写法）和B中⇒（蕴涵的另一种写法）不是标准联结词，不能出现在合式公式中。C:(¬P∨Q)∧(P∨¬Q)和D:¬(P↔Q)均使用标准联结词，是合式公式。选CD。'},
+  {id:13,hw:'1',type:'判断',score:5,q:'联结词集合 $\\{\\land, \\to\\}$ 是联结词完备集。',ans:'错',exp:'联结词完备集需要能表达所有联结词。{∧,→}不能表达¬：当p=0,q=0时p∧q=0,p→q=1，任何∧和→的组合都无法从全假输入得到¬p=1的效果。所以该集合不是完备集。'},
+  {id:14,hw:'1',type:'判断',score:5,q:'命题公式 $G = P \\to (P \\land (Q \\to R))$ 是恒真的。',ans:'错',exp:'要判断G=P→(P∧(Q→R))是否恒真，找反例：取P=1,Q=1,R=0，则Q→R=0，P∧0=0，G=1→0=0。存在赋值使G为假，所以G不是恒真式。'},
+  {id:15,hw:'1',type:'判断',score:5,q:'任何命题公式都存在与之等值的析取范式，且是唯一。',ans:'错',exp:'同一个命题公式可以有多个不同的析取范式。例如(p∨q)∧(p∨r)和p∨(q∧r)都是同一个公式的析取范式但形式不同。只有主析取范式（包含所有变元的极小项的析取）才是唯一的。'},
+  {id:16,hw:'1',type:'判断',score:5,q:'联接词集 $\\{\\lnot, \\land, \\lor, \\to\\}$ 是联接词完备集。',ans:'对',exp:'{¬,∧,∨,→}是联结词完备集，因为：¬直接有；p∨q直接有；p∧q直接有；p→q=¬p∨q可以表达；p↔q=(p→q)∧(q→p)可以表达。所有联结词都可由这四个组合表达。'},
+  {id:17,hw:'1',type:'填空',score:5,q:'解释 $(0, 0)$ 使命题公式 $A = (p \\lor (p \\to q)) \\to q$ 的真值为 ____',ans:'0',exp:'将p=0,q=0代入：A=(0∨(0→0))→0=(0∨1)→0=1→0=0。所以该赋值下公式真值为0。'},
+  {id:18,hw:'1',type:'填空',score:5,q:'若命题公式在各种解释下取值均为真，则称其为 ____',ans:'永真式',exp:'在各种解释（赋值）下取值均为真的命题公式称为永真式，也叫重言式（tautology）。与之对应的是矛盾式（恒假）和可满足式（至少有一种赋值使其为真）。'},
+  {id:19,hw:'1',type:'填空',score:5,q:'$\\lnot p \\to q$ 的主合取范式中极大项个数为 ____',ans:'3',exp:'¬p→q等价于¬(¬p)∨q=p∨q。p∨q为假当且仅当p=0,q=0。3个变元p,q,r共8个极大项，使公式为假的赋值为p=0,q=0,r=0（M0）和p=0,q=0,r=1（M1），共2个。主合取范式中极大项个数为2。'},
+  {id:20,hw:'1',type:'填空',score:5,q:'若 $P \\to Q$ 为假，则 $P$ 的真值为 ____, $Q$ 的真值为 ____',ans:'1,0',exp:'蕴涵式P→Q仅在P为真且Q为假时为假。所以P的真值为1（真），Q的真值为0（假）。'},
+  {id:21,hw:'1',type:'填空',score:5,q:'命题公式 $(p \\leftrightarrow q)$ 的主析取范式为 ____',ans:'(p∧q)∨(¬p∧¬q)',exp:'p↔q为真当且仅当p和q真值相同：p=1,q=1或p=0,q=0。所以主析取范式为m3∨m0=(p∧q)∨(¬p∧¬q)。'},
+  {id:22,hw:'1',type:'判断',score:5,q:'"2是偶数且3是奇数"符号化为 $p \\land q$，其中$p$：2是偶数，$q$：3是奇数。',ans:'对',exp:'"且"对应合取联结词∧。令p="2是偶数"（真），q="3是奇数"（真），则"2是偶数且3是奇数"符号化为p∧q，是正确的。'},
+  {id:23,hw:'1',type:'判断',score:5,q:'"除非你努力，否则不会成功"符号化为 $p \\to q$，其中$p$：你努力，$q$：你会成功。',ans:'错',exp:'"除非p，否则¬q"等价于"如果非p，则非q"，即¬p→¬q，也等价于q→p。而p→q表示"如果p则q"，两者不等价。正确符号化应为¬p→¬q或q→p。'},
+  {id:24,hw:'1',type:'判断',score:5,q:'"$x > 5$" 不是命题，因为$x$的真值不确定。',ans:'对',exp:'命题必须能判断真假。"$x > 5$"中x是自由变元，没有指定具体值，所以无法判断真假，因此不是命题，而是谓词。'},
+  {id:25,hw:'1',type:'判断',score:5,q:'命题"如果天晴，我就去公园"的逆命题是"如果我去公园，那么天晴"。',ans:'对',exp:'原命题"如果p则q"的逆命题是"如果q则p"。原命题：如果天晴(p)则去公园(q)。逆命题：如果去公园(q)则天晴(p)。表述正确。'},
 ];
 
-// ============================================
-// 状态
-// ============================================
-let curHW='all', answered={}, userAns={};
+const HW_NAMES = {'1':'作业1','2':'作业2','3':'作业3','4':'作业4','5':'作业5','6':'作业6','7':'作业7'};
 
-function init(){
-  const hws=[...new Set(Q.map(q=>q.hw))];
-  let navHtml='<button class="active" onclick="switchHW(\'all\',this)">全部</button>';
-  const names={'1':'作业1','2-1':'作业2-1','2-2':'作业2-2','3':'作业3','4':'作业4','4-1':'作业4-1','5':'作业5'};
-  hws.forEach(h=>{navHtml+=`<button onclick="switchHW('${h}',this)">${names[h]||h}</button>`});
-  document.getElementById('nav').innerHTML=navHtml;
-  render();
+// ============================================
+// 状态管理
+// ============================================
+const defaultState = {
+  theme: 'light', fontSize: 'medium', dailyGoal: 20,
+  answered: {}, correct: {}, wrongIds: [], favIds: [],
+  todayDone: 0, lastDate: ''
+};
+let state = JSON.parse(localStorage.getItem('dmq_state')) || {...defaultState};
+
+function saveState() { localStorage.setItem('dmq_state', JSON.stringify(state)); }
+
+function checkDay() {
+  const today = new Date().toDateString();
+  if (state.lastDate !== today) {
+    state.lastDate = today;
+    state.todayDone = 0;
+    saveState();
+  }
 }
 
-function switchHW(hw,el){
-  curHW=hw;
-  document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
+// ============================================
+// 主题与字体
+// ============================================
+function setTheme(theme, el) {
+  state.theme = theme;
+  document.documentElement.setAttribute('data-theme', theme);
+  document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+  if (el) el.classList.add('active');
+  saveState();
+}
+
+function setFont(size, el) {
+  state.fontSize = size;
+  const sizes = {small: '13px', medium: '15px', large: '17px'};
+  document.documentElement.style.setProperty('--font-size-base', sizes[size]);
+  document.querySelectorAll('.font-btn').forEach(b => b.classList.remove('active'));
+  if (el) el.classList.add('active');
+  saveState();
+}
+
+// ============================================
+// 热力图
+// ============================================
+function renderHeatmap() {
+  const heatmap = document.getElementById('heatmap');
+  const months = document.getElementById('heatmap-months');
+  const today = new Date();
+  const startDate = new Date(today);
+  startDate.setDate(startDate.getDate() - 364);
+  const dayData = JSON.parse(localStorage.getItem('dmq_heatmap') || '{}');
+  
+  let html = '';
+  let monthHtml = '';
+  let lastMonth = -1;
+  
+  for (let i = 0; i < 365; i++) {
+    const d = new Date(startDate);
+    d.setDate(d.getDate() + i);
+    const key = d.toDateString();
+    const count = dayData[key] || 0;
+    let level = '';
+    if (count >= 20) level = 'l4';
+    else if (count >= 10) level = 'l3';
+    else if (count >= 5) level = 'l2';
+    else if (count >= 1) level = 'l1';
+    
+    if (d.getDay() === 0) html += '<div class="heatmap-week">';
+    html += `<div class="heatmap-cell ${level}" title="${key}: ${count}题"></div>`;
+    if (d.getDay() === 6 || i === 364) html += '</div>';
+    
+    if (d.getMonth() !== lastMonth && d.getDay() <= 7) {
+      const monthNames = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+      monthHtml += `<div class="heatmap-month">${monthNames[d.getMonth()]}</div>`;
+      lastMonth = d.getMonth();
+    }
+  }
+  
+  heatmap.innerHTML = html;
+  months.innerHTML = monthHtml;
+}
+
+function updateHeatmap() {
+  const today = new Date().toDateString();
+  const dayData = JSON.parse(localStorage.getItem('dmq_heatmap') || '{}');
+  dayData[today] = (dayData[today] || 0) + 1;
+  localStorage.setItem('dmq_heatmap', JSON.stringify(dayData));
+  renderHeatmap();
+}
+
+// ============================================
+// 连续学习天数
+// ============================================
+function calcStreak() {
+  const dayData = JSON.parse(localStorage.getItem('dmq_heatmap') || '{}');
+  let streak = 0;
+  const today = new Date();
+  
+  for (let i = 0; i < 365; i++) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    if (dayData[d.toDateString()]) streak++;
+    else break;
+  }
+  return streak;
+}
+
+// ============================================
+// 每日目标
+// ============================================
+function updateGoal() {
+  const goal = state.dailyGoal || 20;
+  const done = state.todayDone || 0;
+  const pct = Math.min(100, Math.round(done / goal * 100));
+  document.getElementById('goal-fill').style.width = pct + '%';
+  document.getElementById('goal-text').textContent = `${done} / ${goal}`;
+}
+
+function saveGoal() {
+  state.dailyGoal = parseInt(document.getElementById('goal-input').value) || 20;
+  saveState();
+  updateGoal();
+}
+
+// ============================================
+// 导航
+// ============================================
+let currentHW = 'all';
+let filteredQs = [...Q];
+let currentQIndex = 0;
+
+function initNav() {
+  const nav = document.getElementById('nav');
+  const hws = [...new Set(Q.map(q => q.hw))];
+  let html = '<button class="active" onclick="filterHW(\'all\',this)">全部</button>';
+  hws.forEach(h => {
+    html += `<button onclick="filterHW('${h}',this)">${HW_NAMES[h] || h}</button>`;
+  });
+  nav.innerHTML = html;
+}
+
+function filterHW(hw, el) {
+  currentHW = hw;
+  filteredQs = hw === 'all' ? [...Q] : Q.filter(q => q.hw === hw);
+  currentQIndex = 0;
+  el.parentElement.querySelectorAll('button').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
   render();
 }
 
-function getQ(){
-  return curHW==='all'?Q:Q.filter(q=>q.hw===curHW);
-}
+// ============================================
+// 渲染题目
+// ============================================
+let selectedMC = {};
 
-function render(){
-  const qs=getQ();
-  const total=qs.length;
-  const done=qs.filter(q=>answered[q.id]).length;
-  const correct=qs.filter(q=>answered[q.id]&&userAns[q.id]===q.ans).length;
-  const wrong=done-correct;
-
-  document.getElementById('stats').innerHTML=`
-    <div class="item"><div class="num">${total}</div><div class="label">总题数</div></div>
-    <div class="item"><div class="num">${done}</div><div class="label">已做</div></div>
-    <div class="item"><div class="num" style="color:#52c41a">${correct}</div><div class="label">正确</div></div>
-    <div class="item"><div class="num" style="color:#ff4d4f">${wrong}</div><div class="label">错误</div></div>
-    <div class="item"><div class="num">${done?Math.round(correct/done*100):0}%</div><div class="label">正确率</div></div>
-  `;
-  document.getElementById('progress-fill').style.width=`${total?done/total*100:0}%`;
-
-  let html='';
-  qs.forEach(q=>{
-    const isAns=answered[q.id];
-    const isCorr=isAns&&userAns[q.id]===q.ans;
-    const cls=isAns?(isCorr?'answered-correct':'answered-wrong'):'';
-    html+=`<div class="question-card ${cls}" id="card-${q.id}">
+function render() {
+  const quiz = document.getElementById('quiz');
+  const letters = 'ABCDEFGH';
+  let html = '';
+  
+  filteredQs.forEach((q, i) => {
+    const answered = state.answered[q.id];
+    const isCorrect = state.correct[q.id];
+    const isFav = state.favIds.includes(q.id);
+    let cardClass = 'question-card';
+    if (answered) cardClass += isCorrect ? ' answered-correct' : ' answered-wrong';
+    
+    html += `<div class="${cardClass}" id="card-${q.id}" data-idx="${i}">
       <div class="q-top">
-        <span class="q-num">${q.id}. <span class="q-tag">${q.type}</span></span>
-        <span>${isAns?(isCorr?'<span class="result-badge correct">✓ 正确</span>':'<span class="result-badge wrong">✗ 错误</span>'):`<span style="color:#bbb;font-size:12px">${q.score}分</span>`}</span>
+        <span class="q-num">${i + 1}. <span class="q-tag">${q.type}</span> <span style="color:var(--text-secondary);font-size:11px;font-weight:400;margin-left:4px">${HW_NAMES[q.hw] || q.hw}</span></span>
+        <span class="q-fav ${isFav ? 'active' : ''}" onclick="toggleFav(${q.id})">★</span>
       </div>
       <div class="q-body">${q.q}</div>`;
-
-    if(q.type==='单选'||q.type==='多选'){
-      const letters='ABCDEFGH';
-      html+=`<div class="options" id="opts-${q.id}">`;
-      q.opts.forEach((o,i)=>{
-        let cls='opt';
-        if(isAns){
-          cls+=' disabled';
-          if(q.ans.includes(letters[i]))cls+=' correct-answer';
-          else if(userAns[q.id]&&userAns[q.id].includes(letters[i]))cls+=' wrong-answer';
-        }
-        html+=`<div class="${cls}" onclick="selectOpt(${q.id},'${letters[i]}','${q.type}')">
-          <span class="letter">${letters[i]}.</span><span>${o}</span></div>`;
+    
+    if (q.type === '单选' || q.type === '多选') {
+      html += `<div class="options" id="opts-${q.id}">`;
+      q.opts.forEach((o, j) => {
+        let ocls = 'opt';
+        if (answered) ocls += ' disabled';
+        if (answered && q.ans.includes(letters[j])) ocls += ' correct-answer';
+        if (answered && selectedMC[q.id] && (selectedMC[q.id] === letters[j] || (selectedMC[q.id] instanceof Set && selectedMC[q.id].has(letters[j]))) && !isCorrect) ocls += ' wrong-answer';
+        if (!answered && selectedMC[q.id] === letters[j]) ocls += ' selected';
+        if (!answered && selectedMC[q.id] instanceof Set && selectedMC[q.id].has(letters[j])) ocls += ' selected';
+        html += `<div class="${ocls}" onclick="selectMC(${q.id},'${letters[j]}','${q.type}',${i})">
+          <span class="letter">${letters[j]}.</span><span>${o}</span></div>`;
       });
-      html+=`</div>`;
-      if(q.type==='多选'&&!isAns)html+=`<div class="multi-hint">可多选</div>`;
-    } else if(q.type==='填空'){
-      html+=`<div class="fill-area"><input id="fill-${q.id}" placeholder="输入答案..." ${isAns?'disabled':''} 
+      html += `</div>`;
+      if (q.type === '多选') html += `<div class="multi-hint">可多选</div>`;
+      if (!answered) html += `<div class="submit-row"><button class="btn btn-primary btn-sm" onclick="submitMC(${q.id})">提交</button></div>`;
+    } else if (q.type === '填空') {
+      html += `<div class="fill-area"><input id="fill-${q.id}" placeholder="输入答案..." ${answered ? 'disabled' : ''} value="${answered ? (state.answered[q.id] || '') : ''}"
         onkeydown="if(event.key==='Enter')submitFill(${q.id})"></div>`;
-    } else if(q.type==='判断'){
-      html+=`<div class="tf-btns" id="tf-${q.id}">
-        <div class="tf-btn ${isAns?(q.ans==='对'?'correct-answer':'')+(userAns[q.id]==='对'&&q.ans!=='对'?' wrong-answer':'')+(isAns?' disabled':''):''}" 
-          onclick="submitTF(${q.id},'对')">${isAns&&q.ans==='对'?'✓ ':''}对</div>
-        <div class="tf-btn ${isAns?(q.ans==='错'?'correct-answer':'')+(userAns[q.id]==='错'&&q.ans!=='错'?' wrong-answer':'')+(isAns?' disabled':''):''}"
-          onclick="submitTF(${q.id},'错')">${isAns&&q.ans==='错'?'✓ ':''}错</div>
+      if (!answered) html += `<div class="submit-row"><button class="btn btn-primary btn-sm" onclick="submitFill(${q.id})">确认</button></div>`;
+    } else if (q.type === '判断') {
+      html += `<div class="tf-btns">
+        <div class="tf-btn ${(answered && state.answered[q.id] === '对') ? (isCorrect ? 'correct-answer' : 'wrong-answer') : ''} ${!answered && selectedMC[q.id] === '对' ? 'selected' : ''}" onclick="selectTF(${q.id},'对',${i})">对</div>
+        <div class="tf-btn ${(answered && state.answered[q.id] === '错') ? (isCorrect ? 'correct-answer' : 'wrong-answer') : ''} ${!answered && selectedMC[q.id] === '错' ? 'selected' : ''}" onclick="selectTF(${q.id},'错',${i})">错</div>
       </div>`;
+      if (!answered) html += `<div class="submit-row"><button class="btn btn-primary btn-sm" onclick="submitTF(${q.id})">提交</button></div>`;
     }
-
-    if(q.type==='单选'||q.type==='多选'){
-      html+=`<div class="submit-row">
-        <button class="btn btn-primary" id="sub-${q.id}" onclick="submitMC(${q.id})" ${isAns?'disabled':''}>提交</button>
-        ${isAns?`<span style="font-size:13px;color:#888">正确答案: ${q.ans}</span>`:''}
-      </div>`;
+    
+    if (answered) {
+      html += `<div class="result-badge ${isCorrect ? 'correct' : 'wrong'}">${isCorrect ? '✓ 正确' : '✗ 错误'}</div>`;
+      html += `<div class="explain-box show"><div class="title">解析</div>${q.exp}</div>`;
     }
-    if(q.type==='填空'&&!isAns){
-      html+=`<div class="submit-row"><button class="btn btn-primary" onclick="submitFill(${q.id})">提交</button></div>`;
-    }
-
-    html+=`<div class="explain-box ${isAns?'show':''}" id="exp-${q.id}">
-      <div class="title">📝 解析</div>${q.exp}</div></div>`;
+    
+    html += `</div>`;
   });
-
-  if(!qs.length)html='<div class="empty-msg">暂无题目</div>';
-  document.getElementById('quiz').innerHTML=html;
-  if(window.MathJax&&MathJax.typeset)MathJax.typeset();
+  
+  quiz.innerHTML = html;
+  if (window.MathJax && MathJax.typeset) MathJax.typeset();
+  
+  updateStats();
 }
 
-// 单选/多选选择
-const selectedMC={};
-function selectOpt(id,letter,type){
-  if(answered[id])return;
-  if(!selectedMC[id])selectedMC[id]=type==='多选'?new Set():'';
-  if(type==='多选'){
-    if(selectedMC[id].has(letter))selectedMC[id].delete(letter);
+// ============================================
+// 选择与提交
+// ============================================
+function selectMC(id, letter, type, idx) {
+  if (state.answered[id]) return;
+  currentQIndex = idx;
+  
+  if (type === '多选') {
+    if (!selectedMC[id] || typeof selectedMC[id] === 'string') selectedMC[id] = new Set();
+    if (selectedMC[id].has(letter)) selectedMC[id].delete(letter);
     else selectedMC[id].add(letter);
   } else {
-    selectedMC[id]=letter;
+    selectedMC[id] = letter;
   }
-  // 更新UI
-  const opts=document.querySelectorAll(`#opts-${id} .opt`);
-  const letters='ABCDEFGH';
-  opts.forEach((o,i)=>{
-    o.classList.remove('selected');
-    if(type==='多选'){
-      if(selectedMC[id].has(letters[i]))o.classList.add('selected');
+  render();
+}
+
+function selectTF(id, val, idx) {
+  if (state.answered[id]) return;
+  currentQIndex = idx;
+  selectedMC[id] = val;
+  render();
+}
+
+function submitMC(id) {
+  if (state.answered[id]) return;
+  const q = Q.find(q => q.id === id);
+  if (!q) return;
+  
+  const ans = selectedMC[id];
+  if (!ans || (ans instanceof Set && ans.size === 0)) return;
+  
+  let correct = false;
+  if (q.type === '多选') {
+    const userAns = ans instanceof Set ? [...ans].sort().join('') : ans;
+    correct = userAns === q.ans;
+  } else {
+    correct = ans === q.ans;
+  }
+  
+  state.answered[id] = ans instanceof Set ? [...ans].join('') : ans;
+  state.correct[id] = correct;
+  if (correct) state.todayDone = (state.todayDone || 0) + 1;
+  else if (!state.wrongIds.includes(id)) state.wrongIds.push(id);
+  
+  saveState();
+  updateHeatmap();
+  render();
+}
+
+function submitFill(id) {
+  if (state.answered[id]) return;
+  const q = Q.find(q => q.id === id);
+  if (!q) return;
+  
+  const input = document.getElementById(`fill-${id}`);
+  const ans = input ? input.value.trim() : '';
+  if (!ans) return;
+  
+  const correct = ans === q.ans;
+  state.answered[id] = ans;
+  state.correct[id] = correct;
+  if (correct) state.todayDone = (state.todayDone || 0) + 1;
+  else if (!state.wrongIds.includes(id)) state.wrongIds.push(id);
+  
+  saveState();
+  updateHeatmap();
+  render();
+}
+
+function submitTF(id) {
+  if (state.answered[id]) return;
+  const q = Q.find(q => q.id === id);
+  if (!q) return;
+  
+  const ans = selectedMC[id];
+  if (!ans) return;
+  
+  const correct = ans === q.ans;
+  state.answered[id] = ans;
+  state.correct[id] = correct;
+  if (correct) state.todayDone = (state.todayDone || 0) + 1;
+  else if (!state.wrongIds.includes(id)) state.wrongIds.push(id);
+  
+  saveState();
+  updateHeatmap();
+  render();
+}
+
+// ============================================
+// 收藏
+// ============================================
+function toggleFav(id) {
+  const idx = state.favIds.indexOf(id);
+  if (idx === -1) state.favIds.push(id);
+  else state.favIds.splice(idx, 1);
+  saveState();
+  render();
+}
+
+// ============================================
+// 统计
+// ============================================
+function updateStats() {
+  const total = Q.length;
+  const done = Object.keys(state.answered).length;
+  const correct = Object.values(state.correct).filter(v => v).length;
+  const wrong = done - correct;
+  const rate = done ? Math.round(correct / done * 100) : 0;
+  
+  document.getElementById('stats').innerHTML = `
+    <div class="stat-card total"><div class="num">${total}</div><div class="label">总题数</div></div>
+    <div class="stat-card done"><div class="num">${done}</div><div class="label">已做</div></div>
+    <div class="stat-card right"><div class="num">${correct}</div><div class="label">正确</div></div>
+    <div class="stat-card wrong"><div class="num">${wrong}</div><div class="label">错误</div></div>
+    <div class="stat-card rate"><div class="num">${rate}%</div><div class="label">正确率</div></div>
+  `;
+  
+  document.getElementById('progress-fill').style.width = `${(done / total * 100)}%`;
+  document.getElementById('streak-num').textContent = calcStreak();
+  document.getElementById('today-count').textContent = state.todayDone || 0;
+  updateGoal();
+}
+
+// ============================================
+// 侧面板
+// ============================================
+function openPanel() {
+  document.getElementById('panel-overlay').classList.add('open');
+  document.getElementById('side-panel').classList.add('open');
+  switchPanelTab('wrong', document.querySelector('#panel-tabs button'));
+}
+
+function closePanel() {
+  document.getElementById('panel-overlay').classList.remove('open');
+  document.getElementById('side-panel').classList.remove('open');
+}
+
+function switchPanelTab(tab, el) {
+  el.parentElement.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  
+  const body = document.getElementById('panel-body');
+  let html = '';
+  
+  if (tab === 'wrong') {
+    if (state.wrongIds.length === 0) {
+      html = '<div class="empty-msg">暂无错题</div>';
     } else {
-      if(selectedMC[id]===letters[i])o.classList.add('selected');
+      state.wrongIds.forEach(id => {
+        const q = Q.find(q => q.id === id);
+        if (q) {
+          html += `<div class="wrong-item" onclick="jumpToQ(${q.id})">
+            <div class="wi-q">${q.q.substring(0, 60)}${q.q.length > 60 ? '...' : ''}</div>
+            <div class="wi-meta"><span>${q.type}</span><span>正确答案: ${q.ans}</span></div>
+          </div>`;
+        }
+      });
     }
-  });
+  } else {
+    if (state.favIds.length === 0) {
+      html = '<div class="empty-msg">暂无收藏</div>';
+    } else {
+      state.favIds.forEach(id => {
+        const q = Q.find(q => q.id === id);
+        if (q) {
+          html += `<div class="fav-item" onclick="jumpToQ(${q.id})">
+            <div class="fi-q">${q.q.substring(0, 60)}${q.q.length > 60 ? '...' : ''}</div>
+            <div class="fi-meta">${q.type}</div>
+          </div>`;
+        }
+      });
+    }
+  }
+  
+  body.innerHTML = html;
 }
 
-function submitMC(id){
-  const q=Q.find(x=>x.id===id);
-  let ans=selectedMC[id];
-  if(!ans)return;
-  if(ans instanceof Set)ans=[...ans].sort().join('');
-  answered[id]=true;
-  userAns[id]=ans;
-  document.getElementById(`sub-${id}`).disabled=true;
-  render();
+function jumpToQ(id) {
+  const idx = filteredQs.findIndex(q => q.id === id);
+  if (idx !== -1) {
+    currentQIndex = idx;
+    scrollToQ(id);
+    closePanel();
+    render();
+  }
 }
 
-function submitFill(id){
-  if(answered[id])return;
-  const input=document.getElementById(`fill-${id}`);
-  const val=input.value.trim();
-  if(!val)return;
-  answered[id]=true;
-  userAns[id]=val;
-  render();
+// ============================================
+// 更新日志
+// ============================================
+function toggleChangelog() {
+  document.getElementById('changelog-modal').classList.toggle('open');
 }
 
-function submitTF(id,val){
-  if(answered[id])return;
-  answered[id]=true;
-  userAns[id]=val;
-  render();
-}
+// ============================================
+// 快捷键
+// ============================================
+document.addEventListener('keydown', function(e) {
+  if (e.target.tagName === 'INPUT' && e.target.type !== 'radio') return;
 
-// 点击题目跳转
-document.addEventListener('click',e=>{
-  const card=e.target.closest('.question-card');
-  if(card){
-    const id=card.id.replace('card-','');
-    card.scrollIntoView({behavior:'smooth',block:'center'});
+  const isExamMode = document.getElementById('exam-active-area').style.display !== 'none';
+
+  if (isExamMode) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const q = examState.questions[examState.current];
+      if (q && examState.answers[q.id] === undefined) {
+        if (q.type === '填空') examFill(q.id);
+      }
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      const q = examState.questions[examState.current];
+      if (q && examState.answers[q.id] === undefined) {
+        if (q.type === '单选' || q.type === '多选') {
+          examState.answers[q.id] = q.type === '多选' ? new Set() : undefined;
+          renderExamQuestion();
+        } else if (q.type === '填空') {
+          const input = document.getElementById(`exam-fill-${q.id}`);
+          if (input) input.value = '';
+        }
+      }
+    } else if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+      e.preventDefault();
+      if (e.key === 'ArrowRight') examNav(1);
+      else examNav(-1);
+    } else if (e.key === ' ') {
+      e.preventDefault();
+      const randomIdx = Math.floor(Math.random() * examState.questions.length);
+      jumpExamQ(randomIdx);
+    }
+  } else {
+    if (e.key === 'Enter') {
+      if (filteredQs.length) {
+        const q = filteredQs[currentQIndex];
+        if (q && !state.answered[q.id]) {
+          if (q.type === '单选' || q.type === '多选') submitMC(q.id);
+          else if (q.type === '填空') submitFill(q.id);
+        }
+      }
+    } else if (e.key === 'Escape') {
+      if (filteredQs.length) {
+        const q = filteredQs[currentQIndex];
+        if (q && !state.answered[q.id]) {
+          if (q.type === '单选' || q.type === '多选') {
+            selectedMC[q.id] = q.type === '多选' ? new Set() : '';
+            const opts = document.querySelectorAll(`#opts-${q.id} .opt`);
+            opts.forEach(o => o.classList.remove('selected'));
+          } else if (q.type === '填空') {
+            const input = document.getElementById(`fill-${q.id}`);
+            if (input) input.value = '';
+          }
+        }
+      }
+    } else if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+      e.preventDefault();
+      if (!filteredQs.length) return;
+      if (e.key === 'ArrowRight') currentQIndex = Math.min(filteredQs.length - 1, currentQIndex + 1);
+      else currentQIndex = Math.max(0, currentQIndex - 1);
+      scrollToQ(filteredQs[currentQIndex].id);
+    } else if (e.key === ' ' && !e.target.closest('.fill-area input')) {
+      e.preventDefault();
+      randomQ();
+    }
   }
 });
+
+function scrollToQ(id) {
+  const el = document.getElementById('card-' + id);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function randomQ() {
+  if (!filteredQs.length) return;
+  currentQIndex = Math.floor(Math.random() * filteredQs.length);
+  scrollToQ(filteredQs[currentQIndex].id);
+}
+
+// ============================================
+// 点击题目跟踪索引
+// ============================================
+document.addEventListener('click', function(e) {
+  const card = e.target.closest('.question-card');
+  if (card) {
+    const idx = parseInt(card.dataset.idx);
+    if (!isNaN(idx)) currentQIndex = idx;
+  }
+});
+
+// ============================================
+// PWA Service Worker
+// ============================================
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+
+// ============================================
+// 考试模式
+// ============================================
+let examState = { mode: 'random', hw: 'all', type: 'all', tag: 'all', count: 20, timeLimit: 30, questions: [], current: 0, answers: {}, timer: null, secondsLeft: 0 };
+
+function openExamSetup() {
+  document.getElementById('exam-setup').style.display = 'block';
+  document.getElementById('exam-setup').scrollIntoView({ behavior: 'smooth' });
+  const hws = [...new Set(Q.map(q => q.hw))];
+  let hwHtml = '<span class="exam-chip active" onclick="setExamHW(\'all\',this)">全部</span>';
+  hws.forEach(h => { hwHtml += `<span class="exam-chip" onclick="setExamHW('${h}',this)">${HW_NAMES[h] || h}</span>`; });
+  document.getElementById('exam-hw-chips').innerHTML = hwHtml;
+  const tagNames = Object.keys(TAGS);
+  let tagHtml = '<span class="exam-chip active" onclick="toggleExamTag(\'all\',this)">全部</span>';
+  tagNames.forEach(t => {
+    const count = TAGS[t].length;
+    tagHtml += `<span class="exam-chip" onclick="toggleExamTag('${t}',this)">${t}(${count})</span>`;
+  });
+  document.getElementById('exam-tag-chips').innerHTML = tagHtml;
+  updateExamAvailable();
+}
+
+function closeExamSetup() { document.getElementById('exam-setup').style.display = 'none'; }
+
+function setExamHW(hw, el) {
+  examState.hw = hw;
+  el.parentElement.querySelectorAll('.exam-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  updateExamAvailable();
+}
+
+function toggleExamType(type, el) {
+  examState.type = type;
+  el.parentElement.querySelectorAll('.exam-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  updateExamAvailable();
+}
+
+function toggleExamTag(tag, el) {
+  examState.tag = tag;
+  el.parentElement.querySelectorAll('.exam-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  updateExamAvailable();
+}
+
+function setExamMode(mode, el) {
+  examState.mode = mode;
+  el.parentElement.querySelectorAll('.exam-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  updateExamAvailable();
+}
+
+function getExamPool() {
+  let pool = examState.hw === 'all' ? [...Q] : Q.filter(q => q.hw === examState.hw);
+  if (examState.type !== 'all') pool = pool.filter(q => q.type === examState.type);
+  if (examState.tag !== 'all') {
+    const tagIds = TAGS[examState.tag] || [];
+    pool = pool.filter(q => tagIds.includes(q.id));
+  }
+  if (examState.mode === 'wrong') pool = pool.filter(q => state.wrongIds.includes(q.id));
+  else if (examState.mode === 'fav') pool = pool.filter(q => state.favIds.includes(q.id));
+  else if (examState.mode === 'unseen') pool = pool.filter(q => !state.answered[q.id]);
+  return pool;
+}
+
+function updateExamAvailable() {
+  const pool = getExamPool();
+  document.getElementById('exam-available').textContent = pool.length;
+  document.getElementById('exam-count').max = pool.length;
+  if (parseInt(document.getElementById('exam-count').value) > pool.length) {
+    document.getElementById('exam-count').value = pool.length;
+  }
+}
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
+
+function startExam() {
+  const pool = getExamPool();
+  const count = Math.min(parseInt(document.getElementById('exam-count').value) || 20, pool.length);
+  const timeLimit = parseInt(document.getElementById('exam-time').value) || 0;
+  if (!count) { alert('没有可用题目！'); return; }
+
+  examState.questions = shuffle(pool).slice(0, count);
+  examState.current = 0;
+  examState.answers = {};
+  examState.timeLimit = timeLimit;
+  examState.secondsLeft = timeLimit * 60;
+
+  document.getElementById('exam-setup').style.display = 'none';
+  document.getElementById('exam-active-area').style.display = 'block';
+  document.getElementById('exam-result').style.display = 'none';
+  document.getElementById('quiz').style.display = 'none';
+
+  if (examState.timer) clearInterval(examState.timer);
+  if (timeLimit > 0) {
+    examState.timer = setInterval(() => {
+      examState.secondsLeft--;
+      updateExamTimer();
+      if (examState.secondsLeft <= 0) { clearInterval(examState.timer); submitExam(); }
+    }, 1000);
+  }
+  updateExamTimer();
+  renderExamDots();
+  renderExamQuestion();
+}
+
+function updateExamTimer() {
+  const el = document.getElementById('exam-timer');
+  if (examState.timeLimit <= 0) { el.textContent = '不限时'; el.classList.remove('urgent'); return; }
+  const m = Math.floor(examState.secondsLeft / 60);
+  const s = examState.secondsLeft % 60;
+  el.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+  el.classList.toggle('urgent', examState.secondsLeft <= 60);
+}
+
+function renderExamDots() {
+  const qs = examState.questions;
+  let html = '';
+  qs.forEach((q, i) => {
+    const ans = examState.answers[q.id];
+    let cls = 'exam-dot';
+    if (i === examState.current) cls += ' current';
+    if (ans !== undefined) cls += ' answered';
+    html += `<div class="${cls}" onclick="jumpExamQ(${i})">${i + 1}</div>`;
+  });
+  document.getElementById('exam-dots').innerHTML = html;
+  document.getElementById('exam-progress-text').textContent = `${examState.current + 1} / ${qs.length}`;
+  document.getElementById('exam-progress-fill').style.width = `${(examState.current + 1) / qs.length * 100}%`;
+}
+
+function renderExamQuestion() {
+  const q = examState.questions[examState.current];
+  const prevAns = examState.answers[q.id];
+  const letters = 'ABCDEFGH';
+  let html = `<div class="question-card exam-current">
+    <div class="q-top">
+      <span class="q-num">${examState.current + 1}. <span class="q-tag">${q.type}</span> <span style="color:var(--text-secondary);font-size:11px;font-weight:400;margin-left:4px">${HW_NAMES[q.hw] || q.hw}</span></span>
+      <span style="font-size:12px;color:var(--text-secondary)">${q.score}分</span>
+    </div>
+    <div class="q-body">${q.q}</div>`;
+
+  if (q.type === '单选' || q.type === '多选') {
+    html += `<div class="options" id="exam-opts-${q.id}">`;
+    q.opts.forEach((o, i) => {
+      let ocls = 'opt';
+      if (prevAns && prevAns.includes(letters[i])) ocls += ' selected';
+      html += `<div class="${ocls}" onclick="examSelectOpt(${q.id},'${letters[i]}','${q.type}')">
+        <span class="letter">${letters[i]}.</span><span>${o}</span></div>`;
+    });
+    html += `</div>`;
+    if (q.type === '多选') html += `<div class="multi-hint">可多选</div>`;
+  } else if (q.type === '填空') {
+    html += `<div class="fill-area"><input id="exam-fill-${q.id}" placeholder="输入答案..." value="${prevAns || ''}"
+      onkeydown="if(event.key==='Enter')examFill(${q.id})"></div>`;
+    html += `<div class="submit-row"><button class="btn btn-primary btn-sm" onclick="examFill(${q.id})">确认</button></div>`;
+  } else if (q.type === '判断') {
+    html += `<div class="tf-btns">
+      <div class="tf-btn ${prevAns === '对' ? 'selected' : ''}" onclick="examTF(${q.id},'对')">对</div>
+      <div class="tf-btn ${prevAns === '错' ? 'selected' : ''}" onclick="examTF(${q.id},'错')">错</div>
+    </div>`;
+  }
+
+  html += `</div>`;
+  document.getElementById('exam-quiz').innerHTML = html;
+  if (window.MathJax && MathJax.typeset) MathJax.typeset();
+}
+
+function examSelectOpt(id, letter, type) {
+  if (!examState.answers[id] || typeof examState.answers[id] === 'string' && type === '单选') {
+    if (type === '多选') {
+      if (!examState.answers[id] || typeof examState.answers[id] === 'string') examState.answers[id] = new Set();
+      if (examState.answers[id].has(letter)) examState.answers[id].delete(letter);
+      else examState.answers[id].add(letter);
+    } else {
+      examState.answers[id] = letter;
+    }
+  } else if (type === '多选') {
+    if (examState.answers[id].has(letter)) examState.answers[id].delete(letter);
+    else examState.answers[id].add(letter);
+  }
+  const opts = document.querySelectorAll(`#exam-opts-${id} .opt`);
+  const letters = 'ABCDEFGH';
+  opts.forEach((o, i) => {
+    o.classList.remove('selected');
+    const a = examState.answers[id];
+    if (a instanceof Set) { if (a.has(letters[i])) o.classList.add('selected'); }
+    else { if (a === letters[i]) o.classList.add('selected'); }
+  });
+  renderExamDots();
+}
+
+function examFill(id) {
+  const input = document.getElementById(`exam-fill-${id}`);
+  if (input && input.value.trim()) examState.answers[id] = input.value.trim();
+  renderExamDots();
+}
+
+function examTF(id, val) {
+  examState.answers[id] = val;
+  renderExamDots();
+  renderExamQuestion();
+}
+
+function jumpExamQ(idx) {
+  examState.current = idx;
+  renderExamDots();
+  renderExamQuestion();
+}
+
+function examNav(delta) {
+  const next = examState.current + delta;
+  if (next < 0 || next >= examState.questions.length) return;
+  examState.current = next;
+  renderExamDots();
+  renderExamQuestion();
+}
+
+function submitExam() {
+  if (examState.timer) clearInterval(examState.timer);
+  const qs = examState.questions;
+  let totalScore = 0, gotScore = 0, correctCount = 0;
+  const results = [];
+
+  qs.forEach((q, i) => {
+    const userAns = examState.answers[q.id];
+    let isCorrect = false;
+    if (userAns !== undefined) {
+      let correct = false;
+      if (q.type === '单选' || q.type === '多选') {
+        const ans = userAns instanceof Set ? [...userAns].sort().join('') : (userAns || '');
+        correct = ans === q.ans;
+      } else if (q.type === '填空') {
+        correct = (userAns || '').trim() === q.ans;
+      } else if (q.type === '判断') {
+        correct = userAns === q.ans;
+      }
+      isCorrect = correct;
+      if (correct) { correctCount++; gotScore += q.score; }
+    }
+    totalScore += q.score;
+    results.push({ q, userAns: userAns instanceof Set ? [...userAns].join('') : (userAns || '未作答'), isCorrect, idx: i + 1 });
+  });
+
+  const pct = totalScore ? Math.round(gotScore / totalScore * 100) : 0;
+  const grade = pct >= 90 ? '优秀 🎉' : pct >= 80 ? '良好 👍' : pct >= 60 ? '及格 😊' : '不及格 💪';
+
+  let detailHtml = '';
+  results.forEach(r => {
+    detailHtml += `<div class="exam-result-item">
+      <span class="eri-num">${r.idx}</span>
+      <div class="eri-body">
+        <div style="margin-bottom:4px;line-height:1.5">${r.q.q.substring(0, 80)}${r.q.q.length > 80 ? '...' : ''}</div>
+        <div style="font-size:12px;color:var(--text-secondary)">你的答案: ${r.userAns} &nbsp;|&nbsp; 正确答案: ${r.q.ans}</div>
+      </div>
+      <span class="eri-result ${r.isCorrect ? 'ok' : 'ng'}">${r.isCorrect ? '✓' : '✗'}</span>
+    </div>`;
+  });
+
+  document.getElementById('exam-active-area').style.display = 'none';
+  document.getElementById('exam-result').style.display = 'block';
+  document.getElementById('exam-result').innerHTML = `
+    <h2>考试结束 ${grade}</h2>
+    <div class="exam-score-big">${pct}分</div>
+    <div class="exam-result-stats">
+      <div class="exam-result-stat"><div class="num" style="color:var(--primary)">${qs.length}</div><div class="label">总题数</div></div>
+      <div class="exam-result-stat"><div class="num" style="color:var(--success)">${correctCount}</div><div class="label">正确</div></div>
+      <div class="exam-result-stat"><div class="num" style="color:var(--error)">${qs.length - correctCount}</div><div class="label">错误</div></div>
+      <div class="exam-result-stat"><div class="num" style="color:var(--warning)">${pct}%</div><div class="label">正确率</div></div>
+      <div class="exam-result-stat"><div class="num" style="color:var(--primary)">${gotScore.toFixed(1)}</div><div class="label">得分</div></div>
+    </div>
+    <div class="exam-result-detail">${detailHtml}</div>
+    <div style="margin-top:20px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+      <button class="btn btn-primary" onclick="openExamSetup()">再来一次</button>
+      <button class="btn btn-outline" onclick="exitExam()">返回刷题</button>
+    </div>
+  `;
+  document.getElementById('exam-result').scrollIntoView({ behavior: 'smooth' });
+}
+
+function exitExam() {
+  document.getElementById('exam-active-area').style.display = 'none';
+  document.getElementById('exam-result').style.display = 'none';
+  document.getElementById('quiz').style.display = 'block';
+  render();
+}
+
+// ============================================
+// 初始化
+// ============================================
+function init() {
+  checkDay();
+  setTheme(state.theme, null);
+  setFont(state.fontSize, null);
+  document.getElementById('goal-input').value = state.dailyGoal || 20;
+
+  document.querySelectorAll('.theme-btn').forEach(b => {
+    b.classList.remove('active');
+    if ((state.theme === 'light' && b.title === '日间') ||
+        (state.theme === 'dark' && b.title === '夜间') ||
+        (state.theme === 'eye-care' && b.title === '护眼')) b.classList.add('active');
+  });
+  document.querySelectorAll('.font-btn').forEach(b => {
+    b.classList.remove('active');
+    if ((state.fontSize === 'medium' && b.textContent === '中') ||
+        (state.fontSize === 'small' && b.textContent === '小') ||
+        (state.fontSize === 'large' && b.textContent === '大')) b.classList.add('active');
+  });
+
+  document.getElementById('streak-num').textContent = calcStreak();
+  renderHeatmap();
+  updateGoal();
+  initNav();
+  render();
+}
 
 init();
 </script>
